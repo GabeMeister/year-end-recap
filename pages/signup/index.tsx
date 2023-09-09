@@ -2,18 +2,18 @@ import Footer from "@/src/components/Footer";
 import Navbar from "@/src/components/Navbar";
 import Head from "next/head";
 
-type AboutPageProps = {};
+type SignUpPageProps = {};
 
-export default function AboutPage(props: AboutPageProps) {
+export default function SignUpPage(props: SignUpPageProps) {
   return (
     <>
       <Head>
-        <title>Year End Recap | About</title>
+        <title>Year End Recap | Sign Up</title>
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
       </Head>
       <main>
         <Navbar />
-        <div>This is the About page</div>
+        <div>This is the Sign Up page</div>
         <Footer />
       </main>
     </>

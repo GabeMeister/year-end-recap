@@ -1,12 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 import Button from "./Button";
+import ActionLink from "./ActionLink";
+import { useRouter } from "next/router";
+import BasicLink from "./BasicLink";
 
 type NavbarProps = {};
 
 export default function Navbar(props: NavbarProps) {
+  const router = useRouter();
+
   return (
-    <nav className="flex justify-between">
+    <nav className="m-auto max-w-7xl py-3 flex justify-between items-center">
       <Link className="cursor-pointer" href="/">
         <div className="flex p-3">
           <Image
@@ -19,9 +24,19 @@ export default function Navbar(props: NavbarProps) {
         </div>
       </Link>
       <div>
-        <span>How it works</span>
-        <Link href="/about">About</Link>
-        <Button>Sign Up</Button>
+        <BasicLink href="/#how-does-it-work" className="text-lg mr-6">
+          How it works
+        </BasicLink>
+        <BasicLink href="/about" className="text-lg mr-8">
+          About
+        </BasicLink>
+        <Button
+          onClick={() => {
+            router.push("/signup");
+          }}
+        >
+          Sign Up
+        </Button>
       </div>
     </nav>
   );
