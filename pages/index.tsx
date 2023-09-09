@@ -1,3 +1,5 @@
+import Button from "@/src/components/Button";
+import Navbar from "@/src/components/Navbar";
 import Head from "next/head";
 
 export default function Home() {
@@ -7,8 +9,8 @@ export default function Home() {
         <title>Year End Recap | Home</title>
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
       </Head>
-      <div className="text-xl p-3">
-        <div>Nav Bar</div>
+      <main className="text-xl p-3">
+        <Navbar />
         <div>
           <div>Recap the year with highly amusing Git stats.</div>
           <div>Sign Up Button</div>
@@ -78,7 +80,7 @@ export default function Home() {
             </div>
           </div>
         </footer>
-      </div>
+      </main>
     </>
   );
 }
