@@ -29,8 +29,6 @@ export default function SignUpPage(props: SignUpPageProps) {
     setIsSubmitted(true);
   }
 
-  console.log("errors:", errors);
-
   return (
     <div className="min-h-screen flex flex-col">
       <Head>
