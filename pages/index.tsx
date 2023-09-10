@@ -37,20 +37,29 @@ export default function Home() {
       </Head>
       <Navbar />
       <main>
-        <section className="m-auto max-w-7xl my-32">
-          <h1 className="text-7xl block ml-40 text-gray-800">
-            Recap the year.
+        <section className="m-auto max-w-7xl my-12 md:my-32">
+          <h1 className="text-4xl md:text-5xl lg:text-7xl block ml-12 md:ml-24 lg:ml-40 text-gray-800">
+            Recap the year,
           </h1>
-          <h2 className="text-5xl block mt-24 text-right mr-48 text-gray-800">
-            ...with <span className="italic text-red-700 ">highly</span> amusing
+          <h2 className="text-2xl md:text-3xl lg:text-5xl block mt-6 md:mt-24 text-right mr-6 md:mr-32 lg:mr-42 text-gray-600">
+            with <span className="italic text-red-700 ">highly</span> amusing
             Git stats.
           </h2>
+          <div className="flex justify-center p-6 mt-12 md:mt-32">
+            <img
+              src="/images/terminal-lg.png"
+              alt="terminal"
+              className="rounded-md"
+            />
+          </div>
         </section>
 
-        <section className="bg-amber-50 p-16">
+        <section className="bg-amber-50 p-12 lg:p-16">
           <div className="m-auto max-w-7xl flex flex-col items-center">
-            <h1 className="text-5xl">What is the year end recap?</h1>
-            <div className="w-1/2 mt-12">
+            <h1 className="text-3xl lg:text-5xl text-center">
+              What is the year end recap?
+            </h1>
+            <div className="w-full md:w-2/3 lg:w-1/2 mt-12">
               <YouTube
                 videoId="dWqNgzZwVJQ"
                 opts={{
@@ -65,17 +74,17 @@ export default function Home() {
                   width: "100%",
                 }}
                 className="relative z-[0]"
-                iframeClassName="w-full"
+                iframeClassName="w-full h-48 md:h-80 lg:h-96"
                 title="YouTube video player"
               />
             </div>
           </div>
         </section>
 
-        <section className="p-16">
+        <section className="p-12 lg:p-16">
           <div className="m-auto max-w-7xl">
-            <div className="flex justify-center items-center w-full">
-              <div className="text-xl w-1/3">
+            <div className="flex flex-col lg:flex-row justify-center items-center w-full">
+              <div className="text-xl w-full md:w-1/3">
                 <p>
                   Of all the fun, exciting things that happen in a software
                   company, one of the most memorable is the Year End Recap. At
@@ -95,7 +104,7 @@ export default function Home() {
                 alt="calendar"
                 width={400}
                 height={400}
-                className="rounded-md ml-24 shadow-lg"
+                className="rounded-md mt-12 lg:mt-0 ml-0 lg:ml-24 shadow-lg"
               />
             </div>
             <div className="m-auto text-center mt-24">
@@ -104,18 +113,19 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-amber-50 p-16">
+        <section className="bg-amber-50 p-12 lg:p-16">
           <div className="m-auto max-w-7xl">
             <div className="text-center mb-16">
-              <h1 className="text-5xl">What kind of stats do I get?</h1>
+              <h1 className="text-4xl md:text-5xl">
+                What kind of stats do I get?
+              </h1>
             </div>
             <div>
-              <div className="flex justify-around px-24 mt-12">
+              {/* FIRST ROW */}
+              <div className="flex flex-col lg:flex-row justify-around px-0 md:px-24 mt-12 gap-12 lg:gap-16">
                 <div className="flex flex-col items-center">
-                  <Image
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -123,11 +133,9 @@ export default function Home() {
                     Top Committers
                   </span>
                 </div>
-                <div className="flex flex-col items-center ml-4">
-                  <Image
+                <div className="flex flex-col items-center">
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -135,11 +143,9 @@ export default function Home() {
                     Size of codebase
                   </span>
                 </div>
-                <div className="flex flex-col items-center ml-4">
-                  <Image
+                <div className="flex flex-col items-center">
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -149,12 +155,11 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex justify-around px-24 mt-12">
+              {/* SECOND ROW */}
+              <div className="flex flex-col lg:flex-row justify-around px-0 md:px-24 mt-12 gap-12 lg:gap-16">
                 <div className="flex flex-col items-center">
-                  <Image
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -162,11 +167,9 @@ export default function Home() {
                     Most Productive Days
                   </span>
                 </div>
-                <div className="flex flex-col items-center ml-4">
-                  <Image
+                <div className="flex flex-col items-center">
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -174,11 +177,9 @@ export default function Home() {
                     Branches Merged
                   </span>
                 </div>
-                <div className="flex flex-col items-center ml-4">
-                  <Image
+                <div className="flex flex-col items-center">
+                  <img
                     src="/images/track-lanes.png"
-                    width={200}
-                    height={200}
                     alt="track-lanes"
                     className="rounded-md shadow-lg"
                   />
@@ -199,37 +200,31 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="p-16">
+        <section className="p-12 lg:p-16">
           <div className="m-auto max-w-7xl">
             <div className="text-center mb-16">
-              <h1 id="how-does-it-work" className="text-5xl">
+              <h1 id="how-does-it-work" className="text-4xl md:text-5xl">
                 How does it work?
               </h1>
             </div>
 
-            <div className="flex mt-16 px-48 justify-around items-center">
+            <div className="flex flex-col lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 1:</h3>
-                <span className="text-xl text-gray-600">
-                  Open your repo on a terminal.
-                </span>
+                <span className="text-xl text-gray-600">Open your repo</span>
               </div>
-              <Image
+              <img
                 src="/images/track-lanes.png"
-                width={200}
-                height={200}
                 alt="track-lanes"
-                className="rounded-md shadow-lg"
+                className="rounded-md shadow-lg w-full lg:w-80"
               />
             </div>
 
-            <div className="flex mt-16 px-48 justify-around items-center">
-              <Image
+            <div className="flex flex-col-reverse lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
+              <img
                 src="/images/track-lanes.png"
-                width={200}
-                height={200}
                 alt="track-lanes"
-                className="rounded-md shadow-lg"
+                className="rounded-md shadow-lg w-full lg:w-80"
               />
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 2:</h3>
@@ -237,29 +232,25 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="flex mt-16 px-48 justify-around items-center">
+            <div className="flex flex-col lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 3:</h3>
                 <span className="text-xl text-gray-600">
                   Open the generated pdf
                 </span>
               </div>
-              <Image
+              <img
                 src="/images/track-lanes.png"
-                width={200}
-                height={200}
                 alt="track-lanes"
-                className="rounded-md shadow-lg"
+                className="rounded-md shadow-lg w-full lg:w-80"
               />
             </div>
 
-            <div className="flex mt-12 px-48 justify-around items-center">
-              <Image
+            <div className="flex flex-col-reverse lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
+              <img
                 src="/images/track-lanes.png"
-                width={200}
-                height={200}
                 alt="track-lanes"
-                className="rounded-md shadow-lg"
+                className="rounded-md shadow-lg w-full lg:w-80"
               />
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 4:</h3>
@@ -275,7 +266,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="bg-amber-50 p-16">
+        <section className="bg-amber-50 p-12 lg:p-16">
           <div className="m-auto max-w-7xl">
             <div className="text-center mb-16">
               <h1 id="how-does-it-work" className="text-5xl">
