@@ -2,7 +2,7 @@ import { twMerge } from "tailwind-merge";
 
 type ButtonProps = {
   children: JSX.Element | string;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
 };
 
