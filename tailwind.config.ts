@@ -16,6 +16,14 @@ const config: Config = {
       maxWidth: {
         "8xl": "1485px",
       },
+      colors: {
+        yer: {
+          green: {
+            500: "#00ac22",
+            600: "#00851a",
+          },
+        },
+      },
     },
   },
   plugins: [],

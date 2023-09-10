@@ -16,7 +16,7 @@ export default function Navbar(props: NavbarProps) {
         <Link className="cursor-pointer" href="/">
           <div className="flex p-3">
             <Image
-              src="/images/logo-full-size.png"
+              src="/images/logo-full-size-green.png"
               alt="logo"
               width={30}
               height={30}

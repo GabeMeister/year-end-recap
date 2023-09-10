@@ -22,7 +22,7 @@ function SignUpButton({ children, className = "" }: SignUpButtonProps) {
     <Button onClick={() => router.push("/signup")} className={mergedCss}>
       <div className="text-2xl flex">
         {children}{" "}
-        <FontAwesomeIcon className="inline w-3 mb-1 ml-1" icon={faArrowRight} />
+        <FontAwesomeIcon className="inline w-3 ml-1" icon={faArrowRight} />
       </div>
     </Button>
   );
@@ -52,6 +52,9 @@ export default function Home() {
               className="rounded-md"
             />
           </div>
+          <div className="m-auto text-center mt-12">
+            <SignUpButton className="m-auto">Sign Up Now</SignUpButton>
+          </div>
         </section>
 
         <section className="bg-amber-50 p-12 lg:p-16">
@@ -61,14 +64,13 @@ export default function Home() {
             </h1>
             <div className="w-full md:w-2/3 lg:w-1/2 mt-12">
               <YouTube
-                videoId="dWqNgzZwVJQ"
+                videoId="Cvq0DUCrOJI"
                 opts={{
                   playerVars: {
                     color: "#fff",
-                    controls: 0,
+                    // controls: 0,
                     disablekb: 1,
                     loop: 1,
-                    playlist: `dWqNgzZwVJQ,dWqNgzZwVJQ,dWqNgzZwVJQ`,
                     rel: 0,
                   },
                   width: "100%",
@@ -122,12 +124,12 @@ export default function Home() {
             </div>
             <div>
               {/* FIRST ROW */}
-              <div className="flex flex-col lg:flex-row justify-around px-0 md:px-24 mt-12 gap-12 lg:gap-16">
+              <div className="flex flex-col lg:flex-row justify-around items-end px-0 md:px-24 mt-12 gap-12 lg:gap-16">
                 <div className="flex flex-col items-center">
                   <img
-                    src="/images/track-lanes.png"
+                    src="/images/git-commit.png"
                     alt="track-lanes"
-                    className="rounded-md shadow-lg"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
                   />
                   <span className="inline-block mt-2 font-bold text-xl">
                     Top Committers
@@ -135,43 +137,34 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col items-center">
                   <img
-                    src="/images/track-lanes.png"
+                    src="/images/file-directory.png"
                     alt="track-lanes"
-                    className="rounded-md shadow-lg"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
                   />
                   <span className="inline-block mt-2 font-bold text-xl">
                     Size of codebase
                   </span>
                 </div>
+
                 <div className="flex flex-col items-center">
                   <img
-                    src="/images/track-lanes.png"
+                    src="/images/team-size.png"
                     alt="track-lanes"
-                    className="rounded-md shadow-lg"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
                   />
                   <span className="inline-block mt-2 font-bold text-xl">
-                    Commit Message Analysis
+                    Team Growth Over Time
                   </span>
                 </div>
               </div>
 
               {/* SECOND ROW */}
-              <div className="flex flex-col lg:flex-row justify-around px-0 md:px-24 mt-12 gap-12 lg:gap-16">
+              <div className="flex flex-col lg:flex-row justify-around items-end px-0 md:px-24 mt-12 gap-12 lg:gap-16">
                 <div className="flex flex-col items-center">
                   <img
-                    src="/images/track-lanes.png"
+                    src="/images/git-bubbles.png"
                     alt="track-lanes"
-                    className="rounded-md shadow-lg"
-                  />
-                  <span className="inline-block mt-2 font-bold text-xl">
-                    Most Productive Days
-                  </span>
-                </div>
-                <div className="flex flex-col items-center">
-                  <img
-                    src="/images/track-lanes.png"
-                    alt="track-lanes"
-                    className="rounded-md shadow-lg"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
                   />
                   <span className="inline-block mt-2 font-bold text-xl">
                     Branches Merged
@@ -179,19 +172,25 @@ export default function Home() {
                 </div>
                 <div className="flex flex-col items-center">
                   <img
-                    src="/images/track-lanes.png"
+                    src="/images/days-chart.png"
                     alt="track-lanes"
-                    className="rounded-md shadow-lg"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
                   />
                   <span className="inline-block mt-2 font-bold text-xl">
-                    Team Size
+                    Most Productive Days
                   </span>
                 </div>
-              </div>
-              <div className="flex">
-                <div></div>
-                <div></div>
-                <div></div>
+
+                <div className="flex flex-col items-center">
+                  <img
+                    src="/images/word-cloud.png"
+                    alt="track-lanes"
+                    className="rounded-md shadow-lg w-full sm:w-3/4 lg:w-[300px]"
+                  />
+                  <span className="inline-block mt-2 font-bold text-xl">
+                    Commit Message Analysis
+                  </span>
+                </div>
               </div>
             </div>
             <div className="text-center mt-16">
@@ -211,10 +210,12 @@ export default function Home() {
             <div className="flex flex-col lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 1:</h3>
-                <span className="text-xl text-gray-600">Open your repo</span>
+                <span className="text-xl text-gray-600">
+                  Open your repo on a terminal
+                </span>
               </div>
               <img
-                src="/images/track-lanes.png"
+                src="/images/cd-my-repo.png"
                 alt="track-lanes"
                 className="rounded-md shadow-lg w-full lg:w-80"
               />
@@ -222,13 +223,15 @@ export default function Home() {
 
             <div className="flex flex-col-reverse lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
               <img
-                src="/images/track-lanes.png"
+                src="/images/curl.png"
                 alt="track-lanes"
-                className="rounded-md shadow-lg w-full lg:w-80"
+                className="rounded-md shadow-lg w-full lg:w-96"
               />
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 2:</h3>
-                <span className="text-xl text-gray-600">Run a command</span>
+                <span className="text-xl text-gray-600">
+                  Curl and run the script
+                </span>
               </div>
             </div>
 
@@ -240,17 +243,17 @@ export default function Home() {
                 </span>
               </div>
               <img
-                src="/images/track-lanes.png"
+                src="/images/pdf-icon.png"
                 alt="track-lanes"
-                className="rounded-md shadow-lg w-full lg:w-80"
+                className="rounded-md shadow-lg w-1/2 lg:w-64 m-auto lg:m-0"
               />
             </div>
 
             <div className="flex flex-col-reverse lg:flex-row gap-6 mt-16 px-0 lg:px-48 justify-around items-start lg:items-center">
               <img
-                src="/images/track-lanes.png"
+                src="/images/present-to-team.png"
                 alt="track-lanes"
-                className="rounded-md shadow-lg w-full lg:w-80"
+                className="rounded-md shadow-lg w-full lg:w-80 border-2 border-black"
               />
               <div className="flex flex-col">
                 <h3 className="text-3xl font-bold">Step 4:</h3>
@@ -261,25 +264,7 @@ export default function Home() {
             </div>
 
             <div className="text-center mt-16">
-              <SignUpButton>Try it out!</SignUpButton>
-            </div>
-          </div>
-        </section>
-
-        <section className="bg-amber-50 p-12 lg:p-16">
-          <div className="m-auto max-w-7xl">
-            <div className="text-center mb-16">
-              <h1 id="how-does-it-work" className="text-5xl">
-                FAQ
-              </h1>
-            </div>
-            <div className="m-auto w-2/3">
-              <div>Is this secure?</div>
-              <div>How does this all work?</div>
-              <div>Does this cover multiple repos?</div>
-            </div>
-            <div className="text-center mt-16">
-              <SignUpButton>Sign Up!</SignUpButton>
+              <SignUpButton>Try It Out</SignUpButton>
             </div>
           </div>
         </section>
