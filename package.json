@@ -16,6 +16,7 @@
     "@types/react": "18.2.21",
     "@types/react-dom": "18.2.7",
     "autoprefixer": "10.4.15",
+    "d3": "^7.8.5",
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "next": "13.4.19",
@@ -35,6 +36,7 @@
   "author": "Gabe Jensen <thegabejensen@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/d3": "^7.4.1",
     "@types/pg": "^8.10.2",
     "@types/qs": "^6.9.8"
   }

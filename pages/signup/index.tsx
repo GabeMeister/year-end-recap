@@ -60,7 +60,7 @@ export default function SignUpPage(props: SignUpPageProps) {
             <div className="mt-6 bg-gray-50 border-2 border-gray-100 shadow-xl p-6 md:p-12 w-full md:w-1/2 m-auto rounded-lg">
               <form onSubmit={handleSubmit(onFormSubmit)}>
                 <input
-                  className="w-full text-xl bg-transparent py-1 px-3 border-b-2 border-yer-green-500 focus:border-yes-green-600 outline-0"
+                  className="w-full text-xl bg-transparent py-1 px-3 border-b-2 border-yer-blue-400 focus:border-yes-green-600 outline-0"
                   id="email"
                   type="text"
                   placeholder="Enter your email"

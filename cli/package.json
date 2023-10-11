@@ -1,0 +1,16 @@
+{
+  "name": "year-end-recap-cli",
+  "module": "index.ts",
+  "type": "module",
+  "devDependencies": {
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "execa": "^8.0.1",
+    "shelljs": "^0.8.5",
+    "simple-git": "^3.20.0"
+  }
+}
