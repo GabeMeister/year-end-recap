@@ -11,11 +11,13 @@ const n = 12;
 // The amount of "chunks" to break up the year values (we use linear interpolation)
 const k = 10;
 
+const LOOP_DELAY_IN_MS = 125;
+
 // Duration of how long it takes to swap two rows (in ms)
-const duration = 250;
+const duration = 350;
 
 // Height of the bar
-const barSize = 20;
+const barSize = 30;
 const margin = { top: 16, right: 6, bottom: 6, left: 0 };
 
 const width = 600;
@@ -27,12 +29,9 @@ const y = d3
   .domain(d3.range(n + 1).map((d) => d.toString()))
   .rangeRound([margin.top, margin.top + barSize * (n + 1 + 0.1)])
   .padding(0.1);
+
 const formatDate = d3.utcFormat("%Y");
 const formatNumber = d3.format(",d");
-
-// [
-//    {date: '2000-01-01T00:00:00.000Z', name: 'Coca-Cola', category: 'Beverages', value: 72537},
-// ]
 
 export default function BarChartRacePage() {
   useEffectOnce(async () => {
@@ -103,6 +102,12 @@ export default function BarChartRacePage() {
       return keyframes;
     }
 
+    /*
+      keyframes = [
+        [ Date(), [{ name, value, rank}, { name, value, rank}, etc.] ],
+        [ Date(), [{ name, value, rank}, { name, value, rank}, etc.] ],
+      ]
+    */
     const keyframes = getKeyframes();
 
     const nameframes = d3.groups(
@@ -152,7 +157,16 @@ export default function BarChartRacePage() {
         .text(formatDate(keyframes[0][0]));
 
       return ([date], transition) => {
-        transition.end().then(() => now.text(formatDate(date)));
+        const d = new Date(date);
+        let ending = transition
+          .end()
+          .catch((e) => {
+            // Absolutely no idea why, but the transition promise throws almost every time
+            now.text(formatDate(d));
+          })
+          .then(() => {
+            return now.text(formatDate(d));
+          });
       };
     }
 
@@ -191,18 +205,20 @@ export default function BarChartRacePage() {
                   "transform",
                   (d) =>
                     `translate(${x((prev.get(d) || d).value)},${y(
-                      (prev.get(d) || d).rank
+                      (prev.get(d) || d).rank.toString()
                     )})`
                 )
                 .attr("y", y.bandwidth() / 2)
                 .attr("x", -6)
                 .attr("dy", "-0.25em")
                 .text((d) => d.name)
+                .attr("font-size", "8px")
                 .call((text) =>
                   text
                     .append("tspan")
-                    .attr("fill-opacity", 0.7)
+                    .attr("fill-opacity", 0.6)
                     .attr("font-weight", "normal")
+                    .attr("font-size", "8px")
                     .attr("x", -6)
                     .attr("dy", "1.15em")
                 ),
@@ -215,7 +231,7 @@ export default function BarChartRacePage() {
                   "transform",
                   (d) =>
                     `translate(${x((next.get(d) || d).value)},${y(
-                      (next.get(d) || d).rank
+                      (next.get(d) || d).rank.toString()
                     )})`
                 )
                 .call((g) =>
@@ -229,7 +245,10 @@ export default function BarChartRacePage() {
           .call((bar) =>
             bar
               .transition(transition)
-              .attr("transform", (d) => `translate(${x(d.value)},${y(d.rank)})`)
+              .attr(
+                "transform",
+                (d) => `translate(${x(d.value)},${y(d.rank.toString())})`
+              )
               .call((g) =>
                 g
                   .select("tspan")
@@ -241,10 +260,10 @@ export default function BarChartRacePage() {
     }
 
     function bars(svg) {
-      let bar = svg.append("g").attr("fill-opacity", 0.1).selectAll("rect");
+      let bar = svg.append("g").attr("fill-opacity", 0.8).selectAll("rect");
 
-      return ([date, data], transition) =>
-        (bar = bar
+      return ([_, data], transition) => {
+        return (bar = bar
           .data(data.slice(0, n), (d) => d.name)
           .join(
             (enter) =>
@@ -252,29 +271,42 @@ export default function BarChartRacePage() {
                 .append("rect")
                 .attr("fill", color())
                 .attr("height", y.bandwidth())
+                .attr("rx", "3px")
+                .attr("ry", "3px")
                 .attr("x", x(0))
-                .attr("y", (d) => y((prev.get(d) || d).rank))
+                .attr("y", (d) => {
+                  const final = (prev.get(d) || d).rank.toString();
+
+                  return y(final);
+                })
                 .attr("width", (d) => x((prev.get(d) || d).value) - x(0)),
             (update) => update,
             (exit) =>
               exit
                 .transition(transition)
                 .remove()
-                .attr("y", (d) => y((next.get(d) || d).rank))
+                .attr("y", (d) => {
+                  const final = (next.get(d) || d).rank.toString();
+
+                  return y(final);
+                })
                 .attr("width", (d) => x((next.get(d) || d).value) - x(0))
           )
           .call((bar) =>
             bar
               .transition(transition)
               .attr("y", (d) => {
-                return y(d.rank);
+                let final = y(d.rank.toString());
+
+                return final;
               })
               .attr("width", (d) => x(d.value) - x(0))
           ));
+      };
     }
 
     const svg = d3
-      .select("body")
+      .select("#racing-bar-chart")
       .append("svg")
       .attr("viewBox", [0, 0, width, height]);
 
@@ -293,10 +325,10 @@ export default function BarChartRacePage() {
       x.domain([0, keyframe[1][0].value]);
       updateAxis(keyframe, transition);
       updateBars(keyframe, transition);
-      // updateLabels(keyframe, transition);
-      // updateTicker(keyframe, transition);
+      updateLabels(keyframe, transition);
+      updateTicker(keyframe, transition);
 
-      await delay(100);
+      await delay(LOOP_DELAY_IN_MS);
     }
   });
 
@@ -306,16 +338,80 @@ export default function BarChartRacePage() {
         <title>Bar Chart Race</title>
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
       </Head>
-      <div>
-        <svg
-          width={width + margin.left + margin.right}
-          height={height + margin.top + margin.bottom}
-        >
-          <g transform={`translate(${margin.left},${margin.top})`}>
-            {/* Bars will be rendered here */}
-          </g>
-        </svg>
+      <div className="flex justify-center items-center text-xs">
+        <div id="racing-bar-chart" className="w-1/2" />
       </div>
     </>
   );
 }
+
+/*
+ * RANDOM LETTER JOIN EXAMPLE
+ */
+
+// function randomLetters() {
+//   return d3
+//     .shuffle("abcdefghijklmnopqrstuvwxyz".split(""))
+//     .slice(0, Math.floor(6 + Math.random() * 20))
+//     .sort();
+// }
+
+// export default function BarChartRacePage() {
+//   useEffectOnce(async () => {
+//     // const svg = d3
+//     //   .create("svg")
+//     //   .attr("width", width)
+//     //   .attr("height", 33)
+//     //   .attr("viewBox", `0 -20 ${width} 33`);
+
+//     const svg = d3
+//       .select("#d3-chart")
+//       .append("svg")
+//       .attr("width", width)
+//       .attr("height", 33)
+//       .attr("viewBox", `0 -20 ${width} 33`);
+
+//     while (true) {
+//       const t = svg.transition().duration(750);
+
+//       svg
+//         .selectAll("text")
+//         .data(randomLetters(), (d) => d as string)
+//         .join(
+//           (enter) =>
+//             enter
+//               .append("text")
+//               .attr("fill", "green")
+//               .attr("x", (d, i) => i * 16)
+//               .attr("y", -30)
+//               .text((d) => d)
+//               .call((enter) => enter.transition(t).attr("y", 0)),
+//           (update) =>
+//             update
+//               .attr("fill", "black")
+//               .attr("y", 0)
+//               .call((update) =>
+//                 update.transition(t).attr("x", (d, i) => i * 16)
+//               ),
+//           (exit) =>
+//             exit
+//               .attr("fill", "brown")
+//               .call((exit) => exit.transition(t).attr("y", 30).remove())
+//         );
+
+//       await delay(1000);
+//     }
+//   });
+
+//   return (
+//     <>
+//       <Head>
+//         <title>Bar Chart Race</title>
+//         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
+//       </Head>
+//       <div className="p-6">
+//         <div id="d3-chart" />
+//       </div>
+//     </>
+//   );
+// }
