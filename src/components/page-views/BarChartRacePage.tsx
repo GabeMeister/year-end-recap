@@ -125,6 +125,7 @@ export default function BarChartRacePage() {
     function textTween(a, b) {
       const i = d3.interpolateNumber(a, b);
       return function (t) {
+        // @ts-ignore
         this.textContent = formatNumber(i(t));
       };
     }
@@ -132,8 +133,10 @@ export default function BarChartRacePage() {
     const color = () => {
       const scale = d3.scaleOrdinal(d3.schemeTableau10);
 
-      if (data.some((d) => d.category !== undefined)) {
-        const categoryByName = new Map(data.map((d) => [d.name, d.category]));
+      if (data.some((d) => d["category"] !== undefined)) {
+        const categoryByName = new Map(
+          data.map((d) => [d.name, d["category"]])
+        );
         scale.domain(Array.from(categoryByName.values()));
 
         return (d) => {
