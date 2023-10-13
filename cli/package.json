@@ -9,7 +9,10 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "@types/lodash": "^4.14.199",
+    "d3": "^7.8.5",
     "execa": "^8.0.1",
+    "lodash": "^4.17.21",
     "shelljs": "^0.8.5",
     "simple-git": "^3.20.0"
   }

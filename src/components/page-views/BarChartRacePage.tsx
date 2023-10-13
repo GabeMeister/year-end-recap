@@ -1,6 +1,7 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import data from "../../data/data.json";
+import data from "../../data/commits_over_time.json";
+// import data from "../../data/data.json";
 import useEffectOnce from "@/src/hooks/useEffectOnce";
 import Head from "next/head";
 import { delay } from "@/src/utils/delay";
@@ -9,16 +10,16 @@ import { delay } from "@/src/utils/delay";
 const n = 12;
 
 // The amount of "chunks" to break up the year values (we use linear interpolation)
-const k = 10;
+const k = 5;
 
-const LOOP_DELAY_IN_MS = 125;
+const LOOP_DELAY_IN_MS = 15;
 
 // Duration of how long it takes to swap two rows (in ms)
-const duration = 350;
+const duration = 250;
 
 // Height of the bar
 const barSize = 30;
-const margin = { top: 16, right: 6, bottom: 6, left: 0 };
+const margin = { top: 16, right: 6, bottom: 6, left: 100 };
 
 const width = 600;
 const height = margin.top + barSize * n + margin.bottom;
@@ -30,7 +31,7 @@ const y = d3
   .rangeRound([margin.top, margin.top + barSize * (n + 1 + 0.1)])
   .padding(0.1);
 
-const formatDate = d3.utcFormat("%Y");
+const formatDate = d3.utcFormat("%B, %Y");
 const formatNumber = d3.format(",d");
 
 export default function BarChartRacePage() {
@@ -210,7 +211,7 @@ export default function BarChartRacePage() {
                 )
                 .attr("y", y.bandwidth() / 2)
                 .attr("x", -6)
-                .attr("dy", "-0.25em")
+                .attr("dy", "-.25em")
                 .text((d) => d.name)
                 .attr("font-size", "8px")
                 .call((text) =>
@@ -330,6 +331,9 @@ export default function BarChartRacePage() {
 
       await delay(LOOP_DELAY_IN_MS);
     }
+
+    await delay(500);
+    document.body.style.backgroundColor = "#ffebb3";
   });
 
   return (
