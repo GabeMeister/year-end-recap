@@ -1,4 +1,4 @@
-import { execa } from "execa";
+import execa from "execa";
 import { DUPLICATE_GIT_AUTHOR_NAME_MAP } from "./constants";
 import { CommitData, SummaryData } from "./types";
 
