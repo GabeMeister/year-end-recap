@@ -17,6 +17,7 @@ model repos {
   id           Int       @id @default(autoincrement())
   name         String?
   url          String?
+  ssh_url      String?
   created_date DateTime? @default(now()) @db.Timestamp(6)
   updated_date DateTime? @default(now()) @db.Timestamp(6)
   data         Json?     @db.Json

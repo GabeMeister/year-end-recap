@@ -8,6 +8,7 @@ export type repos = {
     id: Generated<number>;
     name: string | null;
     url: string | null;
+    ssh_url: string | null;
     created_date: Generated<Timestamp | null>;
     updated_date: Generated<Timestamp | null>;
     data: unknown | null;

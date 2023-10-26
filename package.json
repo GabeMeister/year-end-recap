@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "cli": "npx ts-node ./cli/index.ts",
+    "prisma": "prisma",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
