@@ -1,4 +1,4 @@
-import { StringObject } from "./types";
+import { StringObject } from "../../src/types/general";
 
 // duplicate -> actual
 export const DUPLICATE_GIT_AUTHOR_NAME_MAP: StringObject = {

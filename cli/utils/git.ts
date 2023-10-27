@@ -1,12 +1,18 @@
 import execa from "execa";
 import { DUPLICATE_GIT_AUTHOR_NAME_MAP } from "./constants";
-import { CommitData, SummaryData } from "./types";
+import { CommitData, SummaryData } from "../../src/types/git";
+
+export type RepoHost = "github" | "gitlab";
 
 export type RawCommit = {
   name: string;
   date: string;
   message: string;
 };
+
+export function getHost(repoUrl: string): RepoHost {
+  return repoUrl.includes("github") ? "github" : "gitlab";
+}
 
 export function getAuthorName(name: string): string {
   return DUPLICATE_GIT_AUTHOR_NAME_MAP[name] ?? name;

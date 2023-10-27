@@ -1,34 +1,18 @@
 import { runExec } from "../utils/shell";
+import repos, { Repo } from "../data/repos";
+import db from "../../src/db/client";
+import { AuthorCommits, RepoRecap } from "../../src/types/git";
 
-const FRONTEND_DIR = "/home/gabe/dev/rb-frontend";
-const BACKEND_DIR = "/home/gabe/dev/rb-backend";
-const REACT_DIR = "/home/gabe/dev/react";
-const NEXT_JS_DIR = "/home/gabe/dev/next.js";
-const VUE_JS_DIR = "/home/gabe/dev/vue";
-const TENSORFLOW_DIR = "/home/gabe/dev/tensorflow";
+async function calculateGitCommits(path: string): Promise<AuthorCommits[]> {
+  console.log("Calculating git stats...");
 
-const ALL_REPOS = [
-  FRONTEND_DIR,
-  BACKEND_DIR,
-  REACT_DIR,
-  NEXT_JS_DIR,
-  VUE_JS_DIR,
-  TENSORFLOW_DIR,
-];
-
-export type AuthorCommits = {
-  commits: number;
-  name: string;
-};
-
-async function calculateGitStats(repo: string): Promise<AuthorCommits[]> {
   const output = await runExec(
     `mergestat 'SELECT author_name as name, count(*) as commits
       FROM commits GROUP BY name 
       HAVING commits > 10
       ORDER BY commits desc;' -f json`,
     {
-      cwd: repo,
+      cwd: path,
     }
   );
   const repoStats: AuthorCommits[] = JSON.parse(output);
@@ -36,12 +20,51 @@ async function calculateGitStats(repo: string): Promise<AuthorCommits[]> {
   return repoStats;
 }
 
+async function gitPullRepo(path: string) {
+  console.log("Pulling repo...");
+
+  await runExec("git pull", {
+    cwd: path,
+  });
+}
+
+async function upsertCommitStats(repo: Repo, commits: AuthorCommits[]) {
+  console.log("Upserting git commit stats...");
+
+  const now = new Date(Date.now());
+  const repoRecap: RepoRecap = {
+    version: 1,
+    allTimeAuthorCommits: commits,
+  };
+
+  await db
+    .insertInto("repos")
+    .values({
+      name: repo.name,
+      url: repo.url,
+      ssh_url: repo.sshCloneUrl,
+      created_date: now,
+      updated_date: now,
+      data: repoRecap,
+    })
+    .onConflict((oc) =>
+      oc.column("url").doUpdateSet({ updated_date: now, data: repoRecap })
+    )
+    .execute();
+}
+
 async function task() {
-  for (let i = 0; i < ALL_REPOS.length; i++) {
-    const repo = ALL_REPOS[i];
-    const stats = await calculateGitStats(repo);
-    console.log(`\n\n***** ${repo} *****\n`, stats, "\n\n");
+  for (let i = 0; i < repos.length; i++) {
+    const repo = repos[i];
+
+    console.log("\n\n\n==== REPO:", repo.name, " ====\n");
+
+    await gitPullRepo(repo.path);
+    const commitStats = await calculateGitCommits(repo.path);
+    await upsertCommitStats(repo, commitStats);
   }
+
+  console.log("\n\nDone!");
 }
 
 export default task;

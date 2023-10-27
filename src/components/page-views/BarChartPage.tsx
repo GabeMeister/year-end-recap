@@ -1,8 +1,8 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import rawData from "@/src/data/total_commits_frontend.json";
 import useEffectOnce from "@/src/hooks/useEffectOnce";
 import Head from "next/head";
+import { AuthorCommits, RepoRecap } from "@/src/types/git";
 
 // Declare the chart dimensions and margins.
 const width = 1000;
@@ -12,13 +12,14 @@ const marginRight = 30;
 const marginBottom = 80;
 const marginLeft = 50;
 
-// type BarChartData = { letter: string; frequency: number };
-// const data = rawData as BarChartData[];
+type BarChartPageProps = {
+  commits: AuthorCommits[];
+};
 
-export default function BarChartPage() {
+export default function BarChartPage({ commits }: BarChartPageProps) {
   useEffectOnce(async () => {
     // Sort from greatest to least
-    rawData.sort((a, b) => b.commits - a.commits);
+    commits.sort((a, b) => b.commits - a.commits);
 
     /*
      * X SCALE CALCULATION
@@ -27,9 +28,9 @@ export default function BarChartPage() {
       .scaleBand()
       .domain(
         d3.groupSort(
-          rawData,
+          commits,
           ([d]) => -d.commits,
-          (d) => d.author
+          (d) => d.name
         )
       ) // descending frequency
       .range([marginLeft, width - marginRight])
@@ -40,7 +41,7 @@ export default function BarChartPage() {
      */
     const y = d3
       .scaleLinear()
-      .domain([0, d3.max(rawData, (d) => d.commits) as number])
+      .domain([0, d3.max(commits, (d) => d.commits) as number])
       .range([height - marginBottom, marginTop]);
 
     /*
@@ -90,8 +91,8 @@ export default function BarChartPage() {
       .call((g) =>
         g
           .append("text")
-          .attr("x", -marginLeft + 10)
-          .attr("y", 20)
+          .attr("x", -marginLeft + 20)
+          .attr("y", 30)
           .attr("fill", "currentColor")
           .attr("text-anchor", "start")
           .text("↑ Number of Commits")
@@ -105,9 +106,9 @@ export default function BarChartPage() {
       .attr("id", "bars")
       .attr("fill", "steelblue")
       .selectAll("rect")
-      .data(rawData)
+      .data(commits)
       .join("rect")
-      .attr("x", (d) => x(d.author) as number)
+      .attr("x", (d) => x(d.name) as number)
       .attr("y", (d) => {
         return y(0);
       })
@@ -144,8 +145,8 @@ export default function BarChartPage() {
         <title>Bar Chart</title>
         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
       </Head>
-      <div className="flex justify-center items-center text-xs p-6 bg-yer-blue-1000 min-h-screen">
-        <div id="bar-chart" />
+      <div className="flex justify-center items-center text-xs p-6 bg-yer-blue-200 min-h-screen">
+        <div id="bar-chart" className="shadow-2xl" />
       </div>
     </>
   );
