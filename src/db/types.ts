@@ -11,6 +11,7 @@ export type repos = {
     ssh_url: string | null;
     created_date: Generated<Timestamp | null>;
     updated_date: Generated<Timestamp | null>;
+    duplicate_authors: unknown | null;
     data: unknown | null;
 };
 export type signups = {

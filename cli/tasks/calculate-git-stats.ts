@@ -45,10 +45,15 @@ async function upsertCommitStats(repo: Repo, commits: AuthorCommits[]) {
       ssh_url: repo.sshCloneUrl,
       created_date: now,
       updated_date: now,
+      duplicate_authors: repo.duplicateAuthors,
       data: repoRecap,
     })
     .onConflict((oc) =>
-      oc.column("url").doUpdateSet({ updated_date: now, data: repoRecap })
+      oc.column("url").doUpdateSet({
+        updated_date: now,
+        duplicate_authors: repo.duplicateAuthors,
+        data: repoRecap,
+      })
     )
     .execute();
 }

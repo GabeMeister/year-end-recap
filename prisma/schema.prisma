@@ -14,13 +14,14 @@ datasource db {
 }
 
 model repos {
-  id           Int       @id @default(autoincrement())
-  name         String?
-  url          String?   @unique
-  ssh_url      String?
-  created_date DateTime? @default(now()) @db.Timestamp(6)
-  updated_date DateTime? @default(now()) @db.Timestamp(6)
-  data         Json?     @db.Json
+  id                Int       @id @default(autoincrement())
+  name              String?
+  url               String?   @unique
+  ssh_url           String?
+  created_date      DateTime? @default(now()) @db.Timestamp(6)
+  updated_date      DateTime? @default(now()) @db.Timestamp(6)
+  duplicate_authors Json?     @db.Json
+  data              Json?     @db.Json
 }
 
 model signups {
