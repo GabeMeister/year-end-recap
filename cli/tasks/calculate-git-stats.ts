@@ -3,7 +3,14 @@ import repos, { Repo } from "../data/repos";
 import db from "../../src/db/client";
 import { AuthorCommits, RepoRecap } from "../../src/types/git";
 
-async function calculateGitCommits(path: string): Promise<AuthorCommits[]> {
+function getAuthorName(
+  name: string,
+  duplicateAuthors: Record<string, string>
+): string {
+  return duplicateAuthors[name] ? duplicateAuthors[name] : name;
+}
+
+async function calculateGitCommits(repo: Repo): Promise<AuthorCommits[]> {
   console.log("Calculating git stats...");
 
   const output = await runExec(
@@ -12,12 +19,41 @@ async function calculateGitCommits(path: string): Promise<AuthorCommits[]> {
       HAVING commits > 10
       ORDER BY commits desc;' -f json`,
     {
-      cwd: path,
+      cwd: repo.path,
     }
   );
-  const repoStats: AuthorCommits[] = JSON.parse(output);
+  const authorCommits: AuthorCommits[] = JSON.parse(output);
 
-  return repoStats;
+  const authorNameMap: Record<string, number> = {};
+  authorCommits.forEach((author) => {
+    const realName = getAuthorName(author.name, repo.duplicateAuthors);
+
+    if (realName in authorNameMap) {
+      authorNameMap[realName] += author.commits;
+    } else {
+      authorNameMap[realName] = author.commits;
+    }
+  });
+
+  const final: AuthorCommits[] = [];
+  Object.keys(authorNameMap).forEach((name) => {
+    final.push({
+      name,
+      commits: authorNameMap[name],
+    });
+  });
+
+  final.sort((a, b) => {
+    if (a.commits > b.commits) {
+      return -1;
+    } else if (a.commits < b.commits) {
+      return 1;
+    } else {
+      return 0;
+    }
+  });
+
+  return final;
 }
 
 async function gitPullRepo(path: string) {
@@ -65,7 +101,7 @@ async function task() {
     console.log("\n\n\n==== REPO:", repo.name, " ====\n");
 
     await gitPullRepo(repo.path);
-    const commitStats = await calculateGitCommits(repo.path);
+    const commitStats = await calculateGitCommits(repo);
     await upsertCommitStats(repo, commitStats);
   }
 
