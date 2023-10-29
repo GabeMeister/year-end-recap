@@ -13,7 +13,6 @@ export default function BarChart({
 
 export const getServerSideProps = (async ({ query }) => {
   const repoName = query?.repo ?? "RedBalloon Frontend";
-  console.log("\n\n***** repoName *****\n", repoName, "\n\n");
 
   const rows = await db
     .selectFrom("repos")

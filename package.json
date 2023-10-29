@@ -23,6 +23,7 @@
     "eslint": "8.49.0",
     "eslint-config-next": "13.4.19",
     "kysely": "^0.26.3",
+    "lodash": "^4.17.21",
     "next": "13.4.19",
     "pg": "^8.11.3",
     "postcss": "8.4.29",
