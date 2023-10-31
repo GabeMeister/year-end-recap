@@ -4,10 +4,11 @@ import repos, { Repo } from "../data/repos";
 import db from "../../src/db/client";
 import {
   AuthorCommits,
-  AuthorData,
+  TeamAuthorData,
   AuthorFirstCommit,
   AuthorFirstCommits,
   RepoRecap,
+  TeamCommitData,
 } from "../../src/types/git";
 
 function getAuthorName(
@@ -19,6 +20,14 @@ function getAuthorName(
   } else {
     return name;
   }
+}
+
+async function gitPullRepo(path: string) {
+  console.log("Pulling repo...");
+
+  await runExec("git pull", {
+    cwd: path,
+  });
 }
 
 async function getCommitsByAuthor(repo: Repo): Promise<AuthorCommits[]> {
@@ -100,7 +109,7 @@ async function getAuthorFirstCommits(repo: Repo): Promise<AuthorFirstCommits> {
   return authorFirstCommits;
 }
 
-async function getAuthorCounts(repo: Repo): Promise<AuthorData> {
+async function getTeamAuthorCounts(repo: Repo): Promise<TeamAuthorData> {
   const authorFirstCommits: AuthorFirstCommits = await getAuthorFirstCommits(
     repo
   );
@@ -143,17 +152,40 @@ async function getAuthorCounts(repo: Repo): Promise<AuthorData> {
   };
 }
 
-async function gitPullRepo(path: string) {
-  console.log("Pulling repo...");
+async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
+  const now = new Date(Date.now());
+  const stdout1 = await runExec(
+    `mergestat "select count(*) as count from commits where author_when < '${now.getFullYear()}-01-01'" -f json`,
+    {
+      cwd: repo.path,
+    }
+  );
 
-  await runExec("git pull", {
-    cwd: path,
-  });
+  type RawOutput = {
+    count: number;
+  };
+
+  const prevYear: RawOutput = JSON.parse(stdout1)[0];
+
+  const stdout2 = await runExec(
+    `mergestat "select count(*) as count from commits where author_when >= '${now.getFullYear()}-01-01'" -f json`,
+    {
+      cwd: repo.path,
+    }
+  );
+
+  const currYear: RawOutput = JSON.parse(stdout2)[0];
+
+  return {
+    previousYearCount: prevYear.count,
+    currentYearCount: prevYear.count + currYear.count,
+  };
 }
 
 type RepoStats = {
   commitData: AuthorCommits[];
-  authorData: AuthorData;
+  teamAuthorData: TeamAuthorData;
+  teamCommitData: TeamCommitData;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -163,7 +195,8 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
   const repoRecap: RepoRecap = {
     version: 1,
     allTimeAuthorCommits: stats.commitData,
-    newAuthors: stats.authorData,
+    newAuthors: stats.teamAuthorData,
+    teamCommits: stats.teamCommitData,
   };
 
   await db
@@ -191,13 +224,19 @@ async function task() {
   for (let i = 0; i < repos.length; i++) {
     const repo = repos[i];
 
-    console.log("\n\n\n==== REPO:", repo.name, " ====\n");
+    try {
+      console.log("\n\n\n==== REPO:", repo.name, " ====\n");
 
-    await gitPullRepo(repo.path);
-    const commitData = await getCommitsByAuthor(repo);
-    const authorData = await getAuthorCounts(repo);
+      await gitPullRepo(repo.path);
+      const commitData = await getCommitsByAuthor(repo);
+      const teamAuthorData = await getTeamAuthorCounts(repo);
+      const teamCommitData = await getTeamCommitCount(repo);
 
-    await upsertRepo(repo, { commitData, authorData });
+      await upsertRepo(repo, { commitData, teamAuthorData, teamCommitData });
+    } catch (e) {
+      console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
+      console.error(e);
+    }
   }
 
   console.log("\n\nDone!");

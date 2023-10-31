@@ -1,7 +1,8 @@
 export type RepoRecap = {
   version: number;
   allTimeAuthorCommits: AuthorCommits[];
-  newAuthors: AuthorData;
+  newAuthors: TeamAuthorData;
+  teamCommits: TeamCommitData;
 };
 
 export type CommitData = {
@@ -23,8 +24,13 @@ export type AuthorFirstCommit = {
   first_commit: Date;
 };
 
-export type AuthorData = {
+export type TeamAuthorData = {
   previousYearCount: number;
   currentYearCount: number;
   newAuthors: AuthorFirstCommit[];
+};
+
+export type TeamCommitData = {
+  previousYearCount: number;
+  currentYearCount: number;
 };
