@@ -6,6 +6,9 @@ export type Repo = {
   host: "github" | "gitlab";
   // Key (duplicate) -> Value (actual)
   duplicateAuthors: Record<string, string>;
+  includeFiles: string[];
+  excludeFiles: string[];
+  masterBranch: string;
 };
 
 const repos: Repo[] = [
@@ -22,6 +25,9 @@ const repos: Repo[] = [
       EzraYoungren: "Ezra Youngren",
       "Stephen Bremer": "Steve Bremer",
     },
+    includeFiles: ["*.ts", "*.tsx", "*.js", "*.jsx"],
+    excludeFiles: ["node_modules", ".next"],
+    masterBranch: "master",
   },
   {
     name: "RedBalloon Backend",
@@ -34,23 +40,9 @@ const repos: Repo[] = [
       "Stephen Bremer": "Steve Bremer",
       "Kenny Kline": "Kenny",
     },
-  },
-  {
-    name: "RedBalloon Docker Compose Env",
-    url: "https://gitlab.redballoon.dev/devops/rb-docker",
-    path: "/home/gabe/dev/rb-docker",
-    sshCloneUrl:
-      "ssh://git@ssh.gitlab.redballoon.dev:9022/devops/rb-docker.git",
-    host: "gitlab",
-    duplicateAuthors: {},
-  },
-  {
-    name: "React.js",
-    url: "https://github.com/facebook/react",
-    path: "/home/gabe/dev/react",
-    sshCloneUrl: "git@github.com:facebook/react.git",
-    host: "github",
-    duplicateAuthors: {},
+    includeFiles: ["*.ts", "*.js"],
+    excludeFiles: ["node_modules"],
+    masterBranch: "master",
   },
   {
     name: "Next.js",
@@ -59,22 +51,9 @@ const repos: Repo[] = [
     sshCloneUrl: "git@github.com:vercel/next.js.git",
     host: "github",
     duplicateAuthors: {},
-  },
-  {
-    name: "Django",
-    url: "https://github.com/django/django",
-    path: "/home/gabe/dev/django",
-    sshCloneUrl: "git@github.com:django/django.git",
-    host: "github",
-    duplicateAuthors: {},
-  },
-  {
-    name: "TailwindCss",
-    url: "https://github.com/tailwindlabs/tailwindcss",
-    path: "/home/gabe/dev/tailwindcss",
-    sshCloneUrl: "https://github.com/tailwindlabs/tailwindcss",
-    host: "github",
-    duplicateAuthors: {},
+    includeFiles: ["*.ts", "*.tsx", "*.js", "*.jsx"],
+    excludeFiles: ["node_modules"],
+    masterBranch: "canary",
   },
 ];
 

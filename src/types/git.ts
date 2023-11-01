@@ -3,6 +3,7 @@ export type RepoRecap = {
   allTimeAuthorCommits: AuthorCommits[];
   newAuthors: TeamAuthorData;
   teamCommits: TeamCommitData;
+  fileCount: FileCount;
 };
 
 export type CommitData = {
@@ -31,6 +32,11 @@ export type TeamAuthorData = {
 };
 
 export type TeamCommitData = {
-  previousYearCount: number;
-  currentYearCount: number;
+  prevYear: number;
+  currYear: number;
+};
+
+export type FileCount = {
+  prevYear: number;
+  currYear: number;
 };

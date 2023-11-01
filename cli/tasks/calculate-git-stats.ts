@@ -1,4 +1,5 @@
 import { pickBy } from "lodash";
+import { delay } from "../utils/delay";
 import { runExec } from "../utils/shell";
 import repos, { Repo } from "../data/repos";
 import db from "../../src/db/client";
@@ -9,7 +10,9 @@ import {
   AuthorFirstCommits,
   RepoRecap,
   TeamCommitData,
+  FileCount,
 } from "../../src/types/git";
+import { getFirstDayOfYearStr } from "../utils/date";
 
 function getAuthorName(
   name: string,
@@ -177,8 +180,66 @@ async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
   const currYear: RawOutput = JSON.parse(stdout2)[0];
 
   return {
-    previousYearCount: prevYear.count,
-    currentYearCount: prevYear.count + currYear.count,
+    prevYear: prevYear.count,
+    currYear: prevYear.count + currYear.count,
+  };
+}
+
+async function getLastCommitFromPrevYear(repo: Repo): Promise<string> {
+  const firstDayOfYear = getFirstDayOfYearStr();
+  let stdout = await runExec(
+    `mergestat "select hash, max(author_when) as last_commit from commits where author_when < '${firstDayOfYear}';" -f json`,
+    {
+      cwd: repo.path,
+    }
+  );
+
+  type RawOutput = {
+    hash: string;
+    last_commit: string;
+  };
+
+  const output: RawOutput = JSON.parse(stdout)[0];
+
+  return output.hash;
+}
+
+async function getFileCount(repo: Repo): Promise<FileCount> {
+  const excludeFileStr =
+    "\\( " + repo.excludeFiles.map((f) => `-name "${f}"`).join(" -o ") + " \\)";
+  const includeFileStr =
+    "\\( " + repo.includeFiles.map((f) => `-name "${f}"`).join(" -o ") + " \\)";
+
+  const cmd1 = `find . ${excludeFileStr} -prune -o ${includeFileStr} -print | wc -l`;
+  const stdout1 = await runExec(cmd1, {
+    cwd: repo.path,
+  });
+
+  const currYear: number = JSON.parse(stdout1);
+
+  const finalPrevYearCommit = await getLastCommitFromPrevYear(repo);
+
+  console.log(`Checking out repo to commit ${finalPrevYearCommit}...`);
+  await runExec(`git checkout ${finalPrevYearCommit}`, {
+    cwd: repo.path,
+  });
+
+  const cmd2 = `find . ${excludeFileStr} -prune -o ${includeFileStr} -print | wc -l`;
+  const stdout2 = await runExec(cmd2, {
+    cwd: repo.path,
+  });
+
+  const prevYear: number = JSON.parse(stdout2);
+  await delay(5000);
+
+  console.log(`Checking out repo to master...`);
+  await runExec(`git checkout ${repo.masterBranch}`, {
+    cwd: repo.path,
+  });
+
+  return {
+    prevYear,
+    currYear,
   };
 }
 
@@ -186,6 +247,7 @@ type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
   teamCommitData: TeamCommitData;
+  fileCount: FileCount;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -197,6 +259,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     allTimeAuthorCommits: stats.commitData,
     newAuthors: stats.teamAuthorData,
     teamCommits: stats.teamCommitData,
+    fileCount: stats.fileCount,
   };
 
   await db
@@ -231,8 +294,14 @@ async function task() {
       const commitData = await getCommitsByAuthor(repo);
       const teamAuthorData = await getTeamAuthorCounts(repo);
       const teamCommitData = await getTeamCommitCount(repo);
+      const fileCount = await getFileCount(repo);
 
-      await upsertRepo(repo, { commitData, teamAuthorData, teamCommitData });
+      await upsertRepo(repo, {
+        commitData,
+        teamAuthorData,
+        teamCommitData,
+        fileCount,
+      });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
       console.error(e);
