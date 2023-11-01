@@ -4,6 +4,7 @@ export type RepoRecap = {
   newAuthors: TeamAuthorData;
   teamCommits: TeamCommitData;
   fileCount: FileCount;
+  linesOfCode: LinesOfCode;
 };
 
 export type CommitData = {
@@ -37,6 +38,11 @@ export type TeamCommitData = {
 };
 
 export type FileCount = {
+  prevYear: number;
+  currYear: number;
+};
+
+export type LinesOfCode = {
   prevYear: number;
   currYear: number;
 };

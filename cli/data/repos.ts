@@ -7,8 +7,9 @@ export type Repo = {
   // Key (duplicate) -> Value (actual)
   duplicateAuthors: Record<string, string>;
   includeFiles: string[];
-  excludeFiles: string[];
+  excludeDirs: string[];
   masterBranch: string;
+  testFunctions: string[];
 };
 
 const repos: Repo[] = [
@@ -25,9 +26,10 @@ const repos: Repo[] = [
       EzraYoungren: "Ezra Youngren",
       "Stephen Bremer": "Steve Bremer",
     },
-    includeFiles: ["*.ts", "*.tsx", "*.js", "*.jsx"],
-    excludeFiles: ["node_modules", ".next"],
+    includeFiles: ["ts", "tsx", "js", "jsx"],
+    excludeDirs: ["node_modules", ".next"],
     masterBranch: "master",
+    testFunctions: ["it(", "test("],
   },
   {
     name: "RedBalloon Backend",
@@ -40,9 +42,10 @@ const repos: Repo[] = [
       "Stephen Bremer": "Steve Bremer",
       "Kenny Kline": "Kenny",
     },
-    includeFiles: ["*.ts", "*.js"],
-    excludeFiles: ["node_modules"],
+    includeFiles: ["ts", "js", "yml"],
+    excludeDirs: ["node_modules"],
     masterBranch: "master",
+    testFunctions: ["it("],
   },
   {
     name: "Next.js",
@@ -51,9 +54,10 @@ const repos: Repo[] = [
     sshCloneUrl: "git@github.com:vercel/next.js.git",
     host: "github",
     duplicateAuthors: {},
-    includeFiles: ["*.ts", "*.tsx", "*.js", "*.jsx"],
-    excludeFiles: ["node_modules"],
+    includeFiles: ["ts", "tsx", "js", "jsx"],
+    excludeDirs: ["node_modules"],
     masterBranch: "canary",
+    testFunctions: ["it("],
   },
 ];
 
