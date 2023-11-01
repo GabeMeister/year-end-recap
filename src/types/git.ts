@@ -5,6 +5,7 @@ export type RepoRecap = {
   teamCommits: TeamCommitData;
   fileCount: FileCount;
   linesOfCode: LinesOfCode;
+  longestFiles: LongestFiles;
 };
 
 export type CommitData = {
@@ -46,3 +47,8 @@ export type LinesOfCode = {
   prevYear: number;
   currYear: number;
 };
+
+export type LongestFiles = {
+  path: string;
+  lines: number;
+}[];

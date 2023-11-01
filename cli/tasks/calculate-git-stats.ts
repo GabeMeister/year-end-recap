@@ -12,6 +12,7 @@ import {
   TeamCommitData,
   FileCount,
   LinesOfCode,
+  LongestFiles,
 } from "../../src/types/git";
 import { getFirstDayOfYearStr } from "../utils/date";
 
@@ -35,7 +36,7 @@ async function gitPullRepo(path: string) {
 }
 
 async function getCommitsByAuthor(repo: Repo): Promise<AuthorCommits[]> {
-  console.log("Calculating git stats...");
+  console.log("Getting commits by author...");
 
   const output = await runExec(
     `mergestat 'SELECT author_name as name, count(*) as commits
@@ -114,6 +115,8 @@ async function getAuthorFirstCommits(repo: Repo): Promise<AuthorFirstCommits> {
 }
 
 async function getTeamAuthorCounts(repo: Repo): Promise<TeamAuthorData> {
+  console.log("Getting team size...");
+
   const authorFirstCommits: AuthorFirstCommits = await getAuthorFirstCommits(
     repo
   );
@@ -157,6 +160,8 @@ async function getTeamAuthorCounts(repo: Repo): Promise<TeamAuthorData> {
 }
 
 async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
+  console.log("Getting team-wide commit totals...");
+
   const now = new Date(Date.now());
   const stdout1 = await runExec(
     `mergestat "select count(*) as count from commits where author_when < '${now.getFullYear()}-01-01'" -f json`,
@@ -206,6 +211,8 @@ async function getLastCommitFromPrevYear(repo: Repo): Promise<string> {
 }
 
 async function getFileCount(repo: Repo): Promise<FileCount> {
+  console.log("Getting file counts...");
+
   const excludeDirStr =
     "\\( " + repo.excludeDirs.map((d) => `-name "${d}"`).join(" -o ") + " \\)";
   const includeFileStr =
@@ -246,7 +253,8 @@ async function getFileCount(repo: Repo): Promise<FileCount> {
 }
 
 async function getLinesOfCode(repo: Repo): Promise<LinesOfCode> {
-  // npx cloc . --include-ext=ts,tsx,js,jsx --exclude-dir=node_modules,.next --json
+  console.log("Getting lines of code...");
+
   const excludeDirStr = repo.excludeDirs.join(",");
   const includeFileStr = repo.includeFiles.join(",");
 
@@ -290,12 +298,38 @@ async function getLinesOfCode(repo: Repo): Promise<LinesOfCode> {
   };
 }
 
+async function getLongestFiles(repo: Repo): Promise<LongestFiles> {
+  console.log("Getting longest files...");
+
+  const includeFileStr = repo.includeFiles.map((f) => `'*.${f}'`).join(" ");
+  const cmd1 = `git ls-files ${includeFileStr} | xargs wc -l | sort -rh | head -n 4`;
+  const stdout1 = await runExec(cmd1, {
+    cwd: repo.path,
+  });
+
+  const longestFiles = stdout1
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => !!l)
+    .map((l) => {
+      const tokens = l.split(" ");
+      return {
+        lines: parseInt(tokens[0]),
+        path: tokens[1],
+      };
+    })
+    .filter((o) => o.path !== "total");
+
+  return longestFiles;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
   teamCommitData: TeamCommitData;
   fileCount: FileCount;
   linesOfCode: LinesOfCode;
+  longestFiles: LongestFiles;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -309,6 +343,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     teamCommits: stats.teamCommitData,
     fileCount: stats.fileCount,
     linesOfCode: stats.linesOfCode,
+    longestFiles: stats.longestFiles,
   };
 
   await db
@@ -345,6 +380,7 @@ async function task() {
       const teamCommitData = await getTeamCommitCount(repo);
       const fileCount = await getFileCount(repo);
       const linesOfCode = await getLinesOfCode(repo);
+      const longestFiles = await getLongestFiles(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -352,6 +388,7 @@ async function task() {
         teamCommitData,
         fileCount,
         linesOfCode,
+        longestFiles,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
