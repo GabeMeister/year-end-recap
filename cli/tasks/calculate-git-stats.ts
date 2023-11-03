@@ -1,5 +1,6 @@
 import { pickBy } from "lodash";
-import { delay } from "../utils/delay";
+import { createDateMap } from "../utils/date";
+import { uniqBy } from "lodash";
 import { runExec } from "../utils/shell";
 import repos, { Repo } from "../data/repos";
 import db from "../../src/db/client";
@@ -13,8 +14,17 @@ import {
   FileCount,
   LinesOfCode,
   LongestFiles,
+  CommitsDay,
+  AuthorCommitsOverTime,
 } from "../../src/types/git";
-import { getFirstDayOfYearStr } from "../utils/date";
+import {
+  getUnixTimeAtMidnight,
+  getFirstDayOfYearStr,
+  getDateAtMidnight,
+} from "../utils/date";
+import { RawCommit } from "../utils/git";
+import { NumberObject } from "../../src/types/general";
+import { clone } from "../utils/object";
 
 function getAuthorName(
   name: string,
@@ -40,7 +50,7 @@ async function getCommitsByAuthor(repo: Repo): Promise<AuthorCommits[]> {
 
   const output = await runExec(
     `mergestat 'SELECT author_name as name, count(*) as commits
-      FROM commits GROUP BY name 
+      FROM commits GROUP BY name
       HAVING commits > 1
       ORDER BY commits desc;' -f json`,
     {
@@ -323,6 +333,76 @@ async function getLongestFiles(repo: Repo): Promise<LongestFiles> {
   return longestFiles;
 }
 
+async function getGitAuthorCommits(repo: string): Promise<RawCommit[]> {
+  const stdout = await runExec(
+    "mergestat 'SELECT author_name as name, author_when as date, message FROM commits order by author_when' -f json",
+    {
+      cwd: repo,
+    }
+  );
+
+  const commits: RawCommit[] = JSON.parse(stdout);
+
+  return commits;
+}
+
+async function getAuthorCommitsOverTime(
+  repo: Repo
+): Promise<AuthorCommitsOverTime> {
+  const commits = await getGitAuthorCommits(repo.path);
+
+  const allAuthors: string[] = uniqBy(
+    commits.map((c) => c.name),
+    (c) => c
+  );
+  const allDates: Date[] = uniqBy(
+    commits.map((c): number => {
+      return getUnixTimeAtMidnight(c.date);
+    }),
+    (d) => d
+  ).map((d) => new Date(d));
+
+  const authorToCommitMap: NumberObject = {};
+  allAuthors.forEach((a) => {
+    authorToCommitMap[getAuthorName(a, repo.duplicateAuthors)] = 0;
+  });
+
+  // INITIALIZE THE BIG [Date] -> {AUTHOR/COMMIT MAP}
+  const dateToAuthorCommits = createDateMap<NumberObject>();
+
+  allDates.forEach((d) => {
+    const map = clone(authorToCommitMap);
+    dateToAuthorCommits.set(d, map);
+  });
+
+  commits.forEach((c) => {
+    const d = dateToAuthorCommits.get(getDateAtMidnight(c.date));
+    if (!d) {
+      throw new Error(`Unrecognized commit date for ${JSON.stringify(d)}`);
+    }
+
+    d[getAuthorName(c.name, repo.duplicateAuthors)]++;
+  });
+
+  const cumulativeCommits: AuthorCommitsOverTime = [];
+  const cumulativeAuthorCommitMap = clone(authorToCommitMap);
+  for (let [k, v] of dateToAuthorCommits.all()) {
+    for (let [name, numCommits] of Object.entries(v)) {
+      cumulativeCommits.push({
+        date: k.toISOString(),
+        name,
+        value:
+          cumulativeAuthorCommitMap[getAuthorName(name, repo.duplicateAuthors)],
+      });
+
+      cumulativeAuthorCommitMap[getAuthorName(name, repo.duplicateAuthors)] +=
+        numCommits;
+    }
+  }
+
+  return cumulativeCommits;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -330,6 +410,7 @@ type RepoStats = {
   fileCount: FileCount;
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
+  authorCommitsOverTime: AuthorCommitsOverTime;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -344,6 +425,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     fileCount: stats.fileCount,
     linesOfCode: stats.linesOfCode,
     longestFiles: stats.longestFiles,
+    authorCommitsOverTime: stats.authorCommitsOverTime,
   };
 
   await db
@@ -381,6 +463,7 @@ async function task() {
       const fileCount = await getFileCount(repo);
       const linesOfCode = await getLinesOfCode(repo);
       const longestFiles = await getLongestFiles(repo);
+      const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -389,6 +472,7 @@ async function task() {
         fileCount,
         linesOfCode,
         longestFiles,
+        authorCommitsOverTime,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

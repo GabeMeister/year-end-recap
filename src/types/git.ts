@@ -6,6 +6,7 @@ export type RepoRecap = {
   fileCount: FileCount;
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
+  authorCommitsOverTime: AuthorCommitsOverTime;
 };
 
 export type CommitData = {
@@ -52,3 +53,17 @@ export type LongestFiles = {
   path: string;
   lines: number;
 }[];
+
+export type RawCommit = {
+  name: string;
+  date: string;
+  message: string;
+};
+
+export type CommitsDay = {
+  date: string;
+  name: string;
+  value: string;
+};
+
+export type AuthorCommitsOverTime = CommitsDay[];
