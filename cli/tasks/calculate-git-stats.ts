@@ -1,5 +1,5 @@
 import { pickBy } from "lodash";
-import { createDateMap } from "../utils/date";
+import { createDateMap, getDateStr, getLastDayOfYearStr } from "../utils/date";
 import { uniqBy } from "lodash";
 import { runExec } from "../utils/shell";
 import repos, { Repo } from "../data/repos";
@@ -16,6 +16,8 @@ import {
   LongestFiles,
   CommitsDay,
   AuthorCommitsOverTime,
+  CommitStat,
+  LineChangeStat,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
@@ -334,8 +336,9 @@ async function getLongestFiles(repo: Repo): Promise<LongestFiles> {
 }
 
 async function getGitAuthorCommits(repo: string): Promise<RawCommit[]> {
+  const beginningOfYear = getFirstDayOfYearStr();
   const stdout = await runExec(
-    "mergestat 'SELECT author_name as name, author_when as date, message FROM commits order by author_when' -f json",
+    `mergestat "SELECT author_name as name, author_when as date, message FROM commits where author_when >= '${beginningOfYear}' order by author_when" -f json`,
     {
       cwd: repo,
     }
@@ -349,6 +352,8 @@ async function getGitAuthorCommits(repo: string): Promise<RawCommit[]> {
 async function getAuthorCommitsOverTime(
   repo: Repo
 ): Promise<AuthorCommitsOverTime> {
+  console.log("Getting author commits over time...");
+
   const commits = await getGitAuthorCommits(repo.path);
 
   const allAuthors: string[] = uniqBy(
@@ -403,6 +408,89 @@ async function getAuthorCommitsOverTime(
   return cumulativeCommits;
 }
 
+async function getTeamCommitsForYear(repo: Repo): Promise<number> {
+  console.log("Getting team commits for year...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const stdout = await runExec(
+    `mergestat "SELECT count(*) as count FROM commits where author_when > '${firstDayStr}'" -f json`,
+    {
+      cwd: repo.path,
+    }
+  );
+
+  const count: number = JSON.parse(stdout)[0].count;
+
+  return count;
+}
+
+async function getTeamChangedLinesForYear(repo: Repo): Promise<LineChangeStat> {
+  console.log("Getting team changed lines for year...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const lastDayStr = getLastDayOfYearStr();
+  const stdout = await runExec(
+    `git log --since="${firstDayStr}" --until="${lastDayStr}" --stat | grep -E "insertions|deletions"`,
+    {
+      cwd: repo.path,
+    }
+  );
+
+  const allCommitStats: CommitStat[] = stdout.split("\n").map((l) => {
+    const tokens = l
+      .trim()
+      .split(",")
+      .map((part) => {
+        part = part.trim();
+
+        if (part.includes("files changed") || part.includes("file changed")) {
+          const count = parseInt(
+            part.replace(" files changed", "").replace(" file changed", "")
+          );
+
+          return { filesChanged: count };
+        } else if (part.includes("insertions") || part.includes("insertion")) {
+          const count = parseInt(
+            part.replace(" insertions(+)", "").replace(" insertion(+)", "")
+          );
+
+          return { insertions: count };
+        } else if (part.includes("deletions") || part.includes("deletion")) {
+          const count = parseInt(
+            part.replace(" deletions(-)", "").replace(" deletion(-)", "")
+          );
+
+          return { deletions: count };
+        }
+      });
+
+    const commitStats: CommitStat = {
+      filesChanged: 0,
+      insertions: 0,
+      deletions: 0,
+    };
+    tokens.forEach((t) => {
+      commitStats.filesChanged += t?.filesChanged ?? 0;
+      commitStats.insertions += t?.insertions ?? 0;
+      commitStats.deletions += t?.deletions ?? 0;
+    });
+
+    return commitStats;
+  });
+
+  const insertions = allCommitStats.reduce((sum, item) => {
+    return sum + item.insertions;
+  }, 0);
+  const deletions = allCommitStats.reduce((sum, item) => {
+    return sum + item.deletions;
+  }, 0);
+
+  return {
+    insertions,
+    deletions,
+  };
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -411,6 +499,8 @@ type RepoStats = {
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
   authorCommitsOverTime: AuthorCommitsOverTime;
+  teamCommitsForYear: number;
+  teamChangedLinesForYear: LineChangeStat;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -426,6 +516,8 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     linesOfCode: stats.linesOfCode,
     longestFiles: stats.longestFiles,
     authorCommitsOverTime: stats.authorCommitsOverTime,
+    teamCommitsForYear: stats.teamCommitsForYear,
+    teamChangedLinesForYear: stats.teamChangedLinesForYear,
   };
 
   await db
@@ -464,6 +556,8 @@ async function task() {
       const linesOfCode = await getLinesOfCode(repo);
       const longestFiles = await getLongestFiles(repo);
       const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
+      const teamCommitsForYear = await getTeamCommitsForYear(repo);
+      const teamChangedLinesForYear = await getTeamChangedLinesForYear(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -473,6 +567,8 @@ async function task() {
         linesOfCode,
         longestFiles,
         authorCommitsOverTime,
+        teamCommitsForYear,
+        teamChangedLinesForYear,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

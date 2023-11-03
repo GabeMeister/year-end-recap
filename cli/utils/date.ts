@@ -14,9 +14,23 @@ export function getFirstDayOfYear(): Date {
   return new Date(`${now.getFullYear()}-01-01`);
 }
 
+export function getLastDayOfYear(): Date {
+  const now = new Date(Date.now());
+
+  return new Date(`${now.getFullYear()}-12-31`);
+}
+
 // Return 2023-01-01
 export function getFirstDayOfYearStr(): string {
   return format(getFirstDayOfYear(), "yyyy-MM-dd");
+}
+
+export function getLastDayOfYearStr(): string {
+  return format(getLastDayOfYear(), "yyyy-MM-dd");
+}
+
+export function getDateStr(d: Date, formatStr: string = "yyyy-MM-dd"): string {
+  return format(d, formatStr);
 }
 
 export function createDateMap<T>() {

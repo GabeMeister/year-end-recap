@@ -7,6 +7,8 @@ export type RepoRecap = {
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
   authorCommitsOverTime: AuthorCommitsOverTime;
+  teamCommitsForYear: number;
+  teamChangedLinesForYear: LineChangeStat;
 };
 
 export type CommitData = {
@@ -67,3 +69,12 @@ export type CommitsDay = {
 };
 
 export type AuthorCommitsOverTime = CommitsDay[];
+
+export type CommitStat = {
+  filesChanged: number;
+} & LineChangeStat;
+
+export type LineChangeStat = {
+  insertions: number;
+  deletions: number;
+};
