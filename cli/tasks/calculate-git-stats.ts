@@ -14,7 +14,6 @@ import {
   FileCount,
   LinesOfCode,
   LongestFiles,
-  CommitsDay,
   AuthorCommitsOverTime,
   CommitStat,
   LineChangeStat,
@@ -335,10 +334,14 @@ async function getLongestFiles(repo: Repo): Promise<LongestFiles> {
   return longestFiles;
 }
 
-async function getGitAuthorCommits(repo: string): Promise<RawCommit[]> {
+async function getGitAuthorCommits(
+  repo: string,
+  authorsToInclude: string[]
+): Promise<RawCommit[]> {
+  const authorSqlStr = authorsToInclude.map((a) => `'${a}'`).join(",");
   const beginningOfYear = getFirstDayOfYearStr();
   const stdout = await runExec(
-    `mergestat "SELECT author_name as name, author_when as date, message FROM commits where author_when >= '${beginningOfYear}' order by author_when" -f json`,
+    `mergestat "SELECT author_name as name, author_when as date FROM commits where author_when >= '${beginningOfYear}' and author_name in (${authorSqlStr}) order by author_when" -f json`,
     {
       cwd: repo,
     }
@@ -349,12 +352,37 @@ async function getGitAuthorCommits(repo: string): Promise<RawCommit[]> {
   return commits;
 }
 
+async function getTopAuthors(repo: Repo): Promise<string[]> {
+  const duplicateAuthors = Object.keys(repo.duplicateAuthors)
+    .map((a) => `'${a}'`)
+    .join(",");
+
+  const stdout = await runExec(
+    `mergestat "SELECT author_name as name, count(*) as count
+      FROM commits 
+      WHERE name not in (${duplicateAuthors}) 
+      GROUP BY name 
+      ORDER BY count desc" -f json`,
+    {
+      cwd: repo.path,
+    }
+  );
+
+  const authorCommits: AuthorCommits[] = JSON.parse(stdout);
+
+  // Some repos (like Next.js) have over 3,000 contributors. So we just pick the top 20.
+  const final = authorCommits.slice(0, 20).map((a) => a.name);
+
+  return final;
+}
+
 async function getAuthorCommitsOverTime(
   repo: Repo
 ): Promise<AuthorCommitsOverTime> {
   console.log("Getting author commits over time...");
+  const topAuthors = await getTopAuthors(repo);
 
-  const commits = await getGitAuthorCommits(repo.path);
+  const commits = await getGitAuthorCommits(repo.path, topAuthors);
 
   const allAuthors: string[] = uniqBy(
     commits.map((c) => c.name),

@@ -1,10 +1,10 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import data from "../../data/commits_over_time.json";
-// import data from "../../data/data.json";
+import data2 from "../../data/commits_over_time.json";
 import useEffectOnce from "@/src/hooks/useEffectOnce";
 import Head from "next/head";
 import { delay } from "@/src/utils/delay";
+import { AuthorCommitsOverTime } from "@/src/types/git";
 
 // Number of bars
 const n = 12;
@@ -34,7 +34,13 @@ const y = d3
 const formatDate = d3.utcFormat("%B, %Y");
 const formatNumber = d3.format(",d");
 
-export default function BarChartRacePage() {
+type BarChartRacePage = {
+  commitsOverTime: AuthorCommitsOverTime;
+};
+
+export default function BarChartRacePage({
+  commitsOverTime,
+}: BarChartRacePage) {
   useEffectOnce(async () => {
     /*
      *   datevalues = [
@@ -44,7 +50,7 @@ export default function BarChartRacePage() {
      */
     const datevalues = Array.from(
       d3.rollup(
-        data,
+        commitsOverTime,
         ([d]) => d.value,
         (d) => +new Date(d.date),
         (d) => d.name
@@ -53,7 +59,7 @@ export default function BarChartRacePage() {
       .map(([date, data]) => [new Date(date), data])
       .sort(([a], [b]) => d3.ascending(a as Date, b as Date));
 
-    const names = new Set(data.map((d) => d.name));
+    const names = new Set(commitsOverTime.map((d) => d.name));
 
     // Rank all the companies for one particular day
     function rank(value: (name: string) => number) {
@@ -133,9 +139,9 @@ export default function BarChartRacePage() {
     const color = () => {
       const scale = d3.scaleOrdinal(d3.schemeTableau10);
 
-      if (data.some((d) => d["category"] !== undefined)) {
+      if (commitsOverTime.some((d) => d["category"] !== undefined)) {
         const categoryByName = new Map(
-          data.map((d) => [d.name, d["category"]])
+          commitsOverTime.map((d) => [d.name, d["category"]])
         );
         scale.domain(Array.from(categoryByName.values()));
 
@@ -351,74 +357,3 @@ export default function BarChartRacePage() {
     </>
   );
 }
-
-/*
- * RANDOM LETTER JOIN EXAMPLE
- */
-
-// function randomLetters() {
-//   return d3
-//     .shuffle("abcdefghijklmnopqrstuvwxyz".split(""))
-//     .slice(0, Math.floor(6 + Math.random() * 20))
-//     .sort();
-// }
-
-// export default function BarChartRacePage() {
-//   useEffectOnce(async () => {
-//     // const svg = d3
-//     //   .create("svg")
-//     //   .attr("width", width)
-//     //   .attr("height", 33)
-//     //   .attr("viewBox", `0 -20 ${width} 33`);
-
-//     const svg = d3
-//       .select("#d3-chart")
-//       .append("svg")
-//       .attr("width", width)
-//       .attr("height", 33)
-//       .attr("viewBox", `0 -20 ${width} 33`);
-
-//     while (true) {
-//       const t = svg.transition().duration(750);
-
-//       svg
-//         .selectAll("text")
-//         .data(randomLetters(), (d) => d as string)
-//         .join(
-//           (enter) =>
-//             enter
-//               .append("text")
-//               .attr("fill", "green")
-//               .attr("x", (d, i) => i * 16)
-//               .attr("y", -30)
-//               .text((d) => d)
-//               .call((enter) => enter.transition(t).attr("y", 0)),
-//           (update) =>
-//             update
-//               .attr("fill", "black")
-//               .attr("y", 0)
-//               .call((update) =>
-//                 update.transition(t).attr("x", (d, i) => i * 16)
-//               ),
-//           (exit) =>
-//             exit
-//               .attr("fill", "brown")
-//               .call((exit) => exit.transition(t).attr("y", 30).remove())
-//         );
-
-//       await delay(1000);
-//     }
-//   });
-
-//   return (
-//     <>
-//       <Head>
-//         <title>Bar Chart Race</title>
-//         <link rel="icon" type="image/x-icon" href="/images/favicon.ico" />
-//       </Head>
-//       <div className="p-6">
-//         <div id="d3-chart" />
-//       </div>
-//     </>
-//   );
-// }

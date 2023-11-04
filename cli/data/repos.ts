@@ -47,18 +47,18 @@ const repos: Repo[] = [
     masterBranch: "master",
     testFunctions: ["it("],
   },
-  // {
-  //   name: "Next.js",
-  //   url: "https://github.com/vercel/next.js",
-  //   path: "/home/gabe/dev/next.js",
-  //   sshCloneUrl: "git@github.com:vercel/next.js.git",
-  //   host: "github",
-  //   duplicateAuthors: {},
-  //   includeFiles: ["ts", "tsx", "js", "jsx"],
-  //   excludeDirs: ["node_modules"],
-  //   masterBranch: "canary",
-  //   testFunctions: ["it("],
-  // },
+  {
+    name: "Next.js",
+    url: "https://github.com/vercel/next.js",
+    path: "/home/gabe/dev/next.js",
+    sshCloneUrl: "git@github.com:vercel/next.js.git",
+    host: "github",
+    duplicateAuthors: {},
+    includeFiles: ["ts", "tsx", "js", "jsx"],
+    excludeDirs: ["node_modules"],
+    masterBranch: "canary",
+    testFunctions: ["it("],
+  },
 ];
 
 export default repos;
