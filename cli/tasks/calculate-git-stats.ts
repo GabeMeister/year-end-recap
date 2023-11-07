@@ -1,5 +1,10 @@
 import { pickBy } from "lodash";
-import { createDateMap, getDateStr, getLastDayOfYearStr } from "../utils/date";
+import {
+  createDateMap,
+  getDateStr,
+  getLastDayOfYearStr,
+  getMonthDisplayName,
+} from "../utils/date";
 import { uniqBy } from "lodash";
 import { runExec } from "../utils/shell";
 import repos, { Repo } from "../data/repos";
@@ -17,6 +22,7 @@ import {
   AuthorCommitsOverTime,
   CommitStat,
   LineChangeStat,
+  TeamCommitsByMonth,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
@@ -26,6 +32,7 @@ import {
 import { RawCommit } from "../utils/git";
 import { NumberObject } from "../../src/types/general";
 import { clone } from "../utils/object";
+import { CommonTableExpressionNameNode } from "kysely";
 
 function getAuthorName(
   name: string,
@@ -519,6 +526,43 @@ async function getTeamChangedLinesForYear(repo: Repo): Promise<LineChangeStat> {
   };
 }
 
+async function getTeamOverallCommitsByMonth(
+  repo: Repo
+): Promise<TeamCommitsByMonth> {
+  console.log("Getting team overall commits by month...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const cmd = `mergestat "
+        select
+          strftime('%m', author_when) as month,
+          count(*) as commits
+        from commits
+        where author_when >= '${firstDayStr}'
+        group by month order by month;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  type CommitsByMonth = {
+    month: string;
+    commits: number;
+  }[];
+
+  const output: CommitsByMonth = JSON.parse(stdout);
+
+  const final: TeamCommitsByMonth = [];
+  for (let i = 0; i < output.length; i++) {
+    const data = output[i];
+
+    final.push({
+      commits: data.commits,
+      month: getMonthDisplayName(parseInt(data.month)),
+    });
+  }
+
+  return final;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -529,6 +573,7 @@ type RepoStats = {
   authorCommitsOverTime: AuthorCommitsOverTime;
   teamCommitsForYear: number;
   teamChangedLinesForYear: LineChangeStat;
+  teamOverallCommitsByMonth: TeamCommitsByMonth;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -546,6 +591,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     authorCommitsOverTime: stats.authorCommitsOverTime,
     teamCommitsForYear: stats.teamCommitsForYear,
     teamChangedLinesForYear: stats.teamChangedLinesForYear,
+    teamOverallCommitsByMonth: stats.teamOverallCommitsByMonth,
   };
 
   await db
@@ -586,6 +632,9 @@ async function task() {
       const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
       const teamCommitsForYear = await getTeamCommitsForYear(repo);
       const teamChangedLinesForYear = await getTeamChangedLinesForYear(repo);
+      const teamOverallCommitsByMonth = await getTeamOverallCommitsByMonth(
+        repo
+      );
 
       await upsertRepo(repo, {
         commitData,
@@ -597,6 +646,7 @@ async function task() {
         authorCommitsOverTime,
         teamCommitsForYear,
         teamChangedLinesForYear,
+        teamOverallCommitsByMonth,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

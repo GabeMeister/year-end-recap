@@ -1,4 +1,4 @@
-import { format } from "date-fns";
+import { format, startOfYear, endOfYear } from "date-fns";
 
 export function getUnixTimeAtMidnight(dateStr: string): number {
   return new Date(dateStr).setHours(0, 0, 0, 0);
@@ -10,14 +10,16 @@ export function getDateAtMidnight(dateStr: string): Date {
 
 export function getFirstDayOfYear(): Date {
   const now = new Date(Date.now());
+  const firstDay = startOfYear(now);
 
-  return new Date(`${now.getFullYear()}-01-01`);
+  return firstDay;
 }
 
 export function getLastDayOfYear(): Date {
   const now = new Date(Date.now());
+  const lastDay = endOfYear(now);
 
-  return new Date(`${now.getFullYear()}-12-31`);
+  return lastDay;
 }
 
 // Return 2023-01-01
@@ -74,4 +76,24 @@ export function createDateMap<T>() {
     all,
     toString,
   };
+}
+
+// NOTE: this is 1-based
+export function getMonthDisplayName(month: number): string {
+  const map = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December",
+  };
+
+  return map[month] ?? "";
 }

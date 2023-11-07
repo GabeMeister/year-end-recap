@@ -9,6 +9,7 @@ export type RepoRecap = {
   authorCommitsOverTime: AuthorCommitsOverTime;
   teamCommitsForYear: number;
   teamChangedLinesForYear: LineChangeStat;
+  teamOverallCommitsByMonth: TeamCommitsByMonth;
 };
 
 export type CommitData = {
@@ -78,3 +79,8 @@ export type LineChangeStat = {
   insertions: number;
   deletions: number;
 };
+
+export type TeamCommitsByMonth = {
+  month: string;
+  commits: number;
+}[];
