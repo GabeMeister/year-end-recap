@@ -9,7 +9,7 @@ export type RepoRecap = {
   authorCommitsOverTime: AuthorCommitsOverTime;
   teamCommitsForYear: number;
   teamChangedLinesForYear: LineChangeStat;
-  teamOverallCommitsByMonth: TeamCommitsByMonth;
+  teamCommitsByMonth: TeamCommitsByMonth;
 };
 
 export type CommitData = {

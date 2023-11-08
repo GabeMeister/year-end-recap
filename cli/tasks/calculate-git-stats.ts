@@ -526,9 +526,7 @@ async function getTeamChangedLinesForYear(repo: Repo): Promise<LineChangeStat> {
   };
 }
 
-async function getTeamOverallCommitsByMonth(
-  repo: Repo
-): Promise<TeamCommitsByMonth> {
+async function getTeamCommitsByMonth(repo: Repo): Promise<TeamCommitsByMonth> {
   console.log("Getting team overall commits by month...");
 
   const firstDayStr = getFirstDayOfYearStr();
@@ -573,7 +571,7 @@ type RepoStats = {
   authorCommitsOverTime: AuthorCommitsOverTime;
   teamCommitsForYear: number;
   teamChangedLinesForYear: LineChangeStat;
-  teamOverallCommitsByMonth: TeamCommitsByMonth;
+  teamCommitsByMonth: TeamCommitsByMonth;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -591,7 +589,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     authorCommitsOverTime: stats.authorCommitsOverTime,
     teamCommitsForYear: stats.teamCommitsForYear,
     teamChangedLinesForYear: stats.teamChangedLinesForYear,
-    teamOverallCommitsByMonth: stats.teamOverallCommitsByMonth,
+    teamCommitsByMonth: stats.teamCommitsByMonth,
   };
 
   await db
@@ -632,9 +630,7 @@ async function task() {
       const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
       const teamCommitsForYear = await getTeamCommitsForYear(repo);
       const teamChangedLinesForYear = await getTeamChangedLinesForYear(repo);
-      const teamOverallCommitsByMonth = await getTeamOverallCommitsByMonth(
-        repo
-      );
+      const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -646,7 +642,7 @@ async function task() {
         authorCommitsOverTime,
         teamCommitsForYear,
         teamChangedLinesForYear,
-        teamOverallCommitsByMonth,
+        teamCommitsByMonth,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
