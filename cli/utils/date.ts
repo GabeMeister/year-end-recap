@@ -97,3 +97,18 @@ export function getMonthDisplayName(month: number): string {
 
   return map[month] ?? "";
 }
+
+// NOTE: this is 0-based (0 is Sunday)
+export function getWeekdayDisplayName(weekday: number): string {
+  const map = {
+    0: "Sunday",
+    1: "Monday",
+    2: "Tuesday",
+    3: "Wednesday",
+    4: "Thursday",
+    5: "Friday",
+    6: "Saturday",
+  };
+
+  return map[weekday] ?? "";
+}
