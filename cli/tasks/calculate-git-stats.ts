@@ -2,6 +2,7 @@ import { pickBy } from "lodash";
 import {
   createDateMap,
   getDateStr,
+  getHourDisplayName,
   getLastDayOfYearStr,
   getMonthDisplayName,
   getWeekdayDisplayName,
@@ -25,6 +26,7 @@ import {
   LineChangeStat,
   TeamCommitsByMonth,
   TeamCommitsByWeekDay,
+  TeamCommitsByHour,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
@@ -601,6 +603,41 @@ async function getTeamCommitsByWeekDay(
   return final;
 }
 
+async function getTeamCommitsByHour(repo: Repo): Promise<TeamCommitsByHour> {
+  console.log("Getting team overall commits by hour...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const cmd = `
+    mergestat "
+      select
+        strftime('%H', datetime(author_when, 'localtime')) as hour,
+        count(*) as commits
+      from commits
+      where author_when >= '${firstDayStr}'
+      and message not like '%into ''master''%'
+      group by hour
+      order by hour;
+    " -f json
+  `;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  const output: TeamCommitsByHour = JSON.parse(stdout);
+
+  const final: TeamCommitsByHour = [];
+  for (let i = 0; i < output.length; i++) {
+    const data = output[i];
+
+    final.push({
+      commits: data.commits,
+      hour: getHourDisplayName(parseInt(data.hour)),
+    });
+  }
+
+  return final;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -613,6 +650,7 @@ type RepoStats = {
   teamChangedLinesForYear: LineChangeStat;
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
+  teamCommitsByHour: TeamCommitsByHour;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -632,6 +670,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     teamChangedLinesForYear: stats.teamChangedLinesForYear,
     teamCommitsByMonth: stats.teamCommitsByMonth,
     teamCommitsByWeekDay: stats.teamCommitsByWeekDay,
+    teamCommitsByHour: stats.teamCommitsByHour,
   };
 
   await db
@@ -674,6 +713,7 @@ async function task() {
       const teamChangedLinesForYear = await getTeamChangedLinesForYear(repo);
       const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
       const teamCommitsByWeekDay = await getTeamCommitsByWeekDay(repo);
+      const teamCommitsByHour = await getTeamCommitsByHour(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -687,6 +727,7 @@ async function task() {
         teamChangedLinesForYear,
         teamCommitsByMonth,
         teamCommitsByWeekDay,
+        teamCommitsByHour,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

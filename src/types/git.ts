@@ -11,6 +11,7 @@ export type RepoRecap = {
   teamChangedLinesForYear: LineChangeStat;
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
+  teamCommitsByHour: TeamCommitsByHour;
 };
 
 export type CommitData = {
@@ -88,5 +89,10 @@ export type TeamCommitsByMonth = {
 
 export type TeamCommitsByWeekDay = {
   weekday: string;
+  commits: number;
+}[];
+
+export type TeamCommitsByHour = {
+  hour: string;
   commits: number;
 }[];
