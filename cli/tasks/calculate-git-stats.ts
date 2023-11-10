@@ -31,7 +31,10 @@ import {
   TeamCommitsByHour,
   HighestCommitDaySummary,
   MostChangesDaySummary,
-  LongestCommit,
+  Commit,
+  CommitMessageLength,
+  AvgReleasesPerDay,
+  MostReleasesInDay,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
@@ -775,10 +778,9 @@ async function getMostChangesInDayByAuthor(
   };
 }
 
-async function getLongestCommit(repo: Repo): Promise<LongestCommit> {
+async function getLongestCommit(repo: Repo): Promise<Commit> {
   console.log("Getting longest commit...");
 
-  const firstDayStr = getFirstDayOfYearStr();
   const cmd = `
       mergestat "
         select
@@ -794,7 +796,86 @@ async function getLongestCommit(repo: Repo): Promise<LongestCommit> {
     cwd: repo.path,
   });
 
-  return JSON.parse(stdout)[0] as LongestCommit;
+  return JSON.parse(stdout)[0] as Commit;
+}
+
+async function getShortestCommits(repo: Repo): Promise<Commit[]> {
+  console.log("Getting shortest commits...");
+
+  const cmd = `
+      mergestat "
+        select
+          hash,
+          length(message) as length,
+          author_name,
+          message,
+          author_when
+        from commits
+        order by length
+        limit 5;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  return JSON.parse(stdout) as Commit[];
+}
+
+async function getCommitMessageLengths(
+  repo: Repo
+): Promise<CommitMessageLength[]> {
+  console.log("Getting commit message lengths...");
+
+  const cmd = `
+      mergestat "
+        select
+          length(message) as length,
+          count(*) as frequency
+        from commits
+        group by length
+        order by length desc;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  return JSON.parse(stdout) as CommitMessageLength[];
+}
+
+async function getAvgReleasesPerDay(repo: Repo): Promise<AvgReleasesPerDay> {
+  console.log("Getting average releases per day...");
+
+  // Divide by 260 working days per year. And it's 260.0 so it's not integer
+  // math. We want the decimal.
+  const cmd = `
+    mergestat "
+      select
+        count(*) / 260.0 as count
+      from commits
+      where message like '%into ''master''%' and message not like '%This reverts merge request%'
+      order by author_when;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  return JSON.parse(stdout)[0] as AvgReleasesPerDay;
+}
+
+async function getMostReleasesInDay(repo: Repo): Promise<MostReleasesInDay> {
+  console.log("Getting most releases in a day...");
+
+  const cmd = `
+    mergestat "
+      select
+        strftime('%Y-%m-%d', datetime(author_when, 'localtime')) as date,
+        count(*) as count
+      from commits
+      where message like '${repo.masterMergeSnippet}'
+      group by date
+      order by count desc;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  return JSON.parse(stdout)[0] as MostReleasesInDay;
 }
 
 type RepoStats = {
@@ -811,7 +892,11 @@ type RepoStats = {
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
   highestCommitDayByAuthor: HighestCommitDaySummary;
-  longestCommit: LongestCommit;
+  longestCommit: Commit;
+  shortestCommits: Commit[];
+  commitMessageLengths: CommitMessageLength[];
+  avgReleasesPerDay: AvgReleasesPerDay;
+  mostReleasesInDay: MostReleasesInDay;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -834,6 +919,10 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     teamCommitsByHour: stats.teamCommitsByHour,
     highestCommitDayByAuthor: stats.highestCommitDayByAuthor,
     longestCommit: stats.longestCommit,
+    shortestCommits: stats.shortestCommits,
+    commitMessageLengths: stats.commitMessageLengths,
+    avgReleasesPerDay: stats.avgReleasesPerDay,
+    mostReleasesInDay: stats.mostReleasesInDay,
   };
 
   await db
@@ -879,6 +968,10 @@ async function task() {
       const teamCommitsByHour = await getTeamCommitsByHour(repo);
       const highestCommitDayByAuthor = await getHighestCommitDayByAuthor(repo);
       const longestCommit = await getLongestCommit(repo);
+      const shortestCommits = await getShortestCommits(repo);
+      const commitMessageLengths = await getCommitMessageLengths(repo);
+      const avgReleasesPerDay = await getAvgReleasesPerDay(repo);
+      const mostReleasesInDay = await getMostReleasesInDay(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -895,6 +988,10 @@ async function task() {
         teamCommitsByHour,
         highestCommitDayByAuthor,
         longestCommit,
+        shortestCommits,
+        commitMessageLengths,
+        avgReleasesPerDay,
+        mostReleasesInDay,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

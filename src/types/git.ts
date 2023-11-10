@@ -13,7 +13,11 @@ export type RepoRecap = {
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
   highestCommitDayByAuthor: HighestCommitDaySummary;
-  longestCommit: LongestCommit;
+  longestCommit: Commit;
+  shortestCommits: Commit[];
+  commitMessageLengths: CommitMessageLength[];
+  avgReleasesPerDay: AvgReleasesPerDay;
+  mostReleasesInDay: MostReleasesInDay;
 };
 
 export type CommitData = {
@@ -116,8 +120,24 @@ export type MostChangesDaySummary = {
   date: string;
 };
 
-export type LongestCommit = {
-  authorName: string;
-  message: number;
+export type Commit = {
+  author_name: string;
+  length: number;
+  author_when: string;
+  message: string;
+  hash: string;
+};
+
+export type CommitMessageLength = {
+  length: number;
+  frequency: number;
+};
+
+export type AvgReleasesPerDay = {
+  count: number;
+};
+
+export type MostReleasesInDay = {
+  count: number;
   date: string;
 };

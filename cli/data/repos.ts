@@ -9,6 +9,7 @@ export type Repo = {
   includeFiles: string[];
   excludeDirs: string[];
   masterBranch: string;
+  masterMergeSnippet: string;
   testFunctions: string[];
 };
 
@@ -29,6 +30,7 @@ const repos: Repo[] = [
     includeFiles: ["ts", "tsx", "js", "jsx"],
     excludeDirs: ["node_modules", ".next"],
     masterBranch: "master",
+    masterMergeSnippet: "%into ''master''%",
     testFunctions: ["it(", "test("],
   },
   {
@@ -45,6 +47,7 @@ const repos: Repo[] = [
     includeFiles: ["ts", "js", "yml"],
     excludeDirs: ["node_modules"],
     masterBranch: "master",
+    masterMergeSnippet: "%into ''master''%",
     testFunctions: ["it("],
   },
   {
@@ -57,6 +60,7 @@ const repos: Repo[] = [
     includeFiles: ["ts", "tsx", "js", "jsx"],
     excludeDirs: ["node_modules"],
     masterBranch: "canary",
+    masterMergeSnippet: "%-canary.%",
     testFunctions: ["it("],
   },
 ];
