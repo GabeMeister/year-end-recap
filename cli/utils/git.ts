@@ -1,6 +1,7 @@
 import execa from "execa";
 import { DUPLICATE_GIT_AUTHOR_NAME_MAP } from "./constants";
-import { CommitData, SummaryData } from "../../src/types/git";
+import { CommitData, CommitStat, SummaryData } from "../../src/types/git";
+import { CommonTableExpressionNameNode } from "kysely";
 
 export type RepoHost = "github" | "gitlab";
 
@@ -66,4 +67,49 @@ export async function getGitAuthorSummary(repo: string): Promise<SummaryData> {
   );
 
   return summaryData;
+}
+
+export function getChangesFromGitLogStr(line: string): CommitStat {
+  const stats = line
+    .trim()
+    .split(",")
+    .map((part) => {
+      part = part.trim();
+
+      if (part.includes("files changed") || part.includes("file changed")) {
+        const count = parseInt(
+          part.replace(" files changed", "").replace(" file changed", "")
+        );
+
+        return { filesChanged: count };
+      } else if (part.includes("insertions") || part.includes("insertion")) {
+        const count = parseInt(
+          part.replace(" insertions(+)", "").replace(" insertion(+)", "")
+        );
+
+        return { insertions: count };
+      } else if (part.includes("deletions") || part.includes("deletion")) {
+        const count = parseInt(
+          part.replace(" deletions(-)", "").replace(" deletion(-)", "")
+        );
+
+        return { deletions: count };
+      } else {
+        throw new Error(`Unrecognized part from git log string: ${part}`);
+      }
+    });
+
+  const commitStats: CommitStat = {
+    filesChanged: 0,
+    insertions: 0,
+    deletions: 0,
+  };
+
+  stats.forEach((stat) => {
+    for (const [key, value] of Object.entries(stat)) {
+      commitStats[key] += value;
+    }
+  });
+
+  return commitStats;
 }

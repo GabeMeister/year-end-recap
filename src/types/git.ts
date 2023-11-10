@@ -12,6 +12,8 @@ export type RepoRecap = {
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
+  highestCommitDayByAuthor: HighestCommitDaySummary;
+  longestCommit: LongestCommit;
 };
 
 export type CommitData = {
@@ -96,3 +98,26 @@ export type TeamCommitsByHour = {
   hour: string;
   commits: number;
 }[];
+
+export type HighestCommitDaySummary = {
+  authorName: string;
+  count: number;
+  date: string;
+  commitMessages: {
+    hash: string;
+    message: string;
+  }[];
+};
+
+export type MostChangesDaySummary = {
+  authorName: string;
+  insertions: number;
+  deletions: number;
+  date: string;
+};
+
+export type LongestCommit = {
+  authorName: string;
+  message: number;
+  date: string;
+};

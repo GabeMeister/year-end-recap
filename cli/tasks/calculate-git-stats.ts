@@ -1,8 +1,10 @@
 import { pickBy } from "lodash";
 import {
+  convertDateToUTC,
   createDateMap,
   getDateStr,
   getHourDisplayName,
+  getLastDayOfYear,
   getLastDayOfYearStr,
   getMonthDisplayName,
   getWeekdayDisplayName,
@@ -27,13 +29,16 @@ import {
   TeamCommitsByMonth,
   TeamCommitsByWeekDay,
   TeamCommitsByHour,
+  HighestCommitDaySummary,
+  MostChangesDaySummary,
+  LongestCommit,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
   getFirstDayOfYearStr,
   getDateAtMidnight,
 } from "../utils/date";
-import { RawCommit } from "../utils/git";
+import { RawCommit, getChangesFromGitLogStr } from "../utils/git";
 import { NumberObject } from "../../src/types/general";
 import { clone } from "../utils/object";
 import { CommonTableExpressionNameNode } from "kysely";
@@ -638,6 +643,160 @@ async function getTeamCommitsByHour(repo: Repo): Promise<TeamCommitsByHour> {
   return final;
 }
 
+async function getHighestCommitDayByAuthor(
+  repo: Repo
+): Promise<HighestCommitDaySummary> {
+  console.log("Getting highest commit day by author...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const cmd = `
+    mergestat "
+      select
+        author_name,
+        count(*) as count,
+        strftime('%Y-%m-%d', datetime(author_when, 'localtime')) as date
+      from commits
+      where author_when > '${firstDayStr}'
+      group by author_name,date
+      order by count desc
+      limit 1;
+    " -f json
+  `;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  type HighestCommitDay = {
+    author_name: string;
+    count: number;
+    date: string;
+  };
+
+  const output: HighestCommitDay[] = JSON.parse(stdout);
+  const highestCommitDay = output[0];
+
+  const dateStr = getDateStr(convertDateToUTC(new Date(highestCommitDay.date)));
+  const cmd2 = `
+    mergestat "
+      select
+        author_name,
+        hash,
+        message
+      from commits
+      where strftime('%Y-%m-%d', datetime(author_when, 'localtime')) = '${dateStr}'
+      and author_name = '${highestCommitDay.author_name}'
+    " -f json
+  `;
+
+  const stdout2 = await runExec(cmd2, {
+    cwd: repo.path,
+  });
+
+  type CommitList = {
+    author_name: string;
+    hash: string;
+    message: string;
+  };
+  const output2: CommitList[] = JSON.parse(stdout2);
+
+  return {
+    authorName: highestCommitDay.author_name,
+    count: highestCommitDay.count,
+    date: highestCommitDay.date,
+    commitMessages: output2.map((c) => ({
+      hash: c.hash,
+      message: c.message,
+    })),
+  };
+}
+
+// Skipping for now, now as useful as I originally thought
+async function getMostChangesInDayByAuthor(
+  repo: Repo
+): Promise<MostChangesDaySummary> {
+  console.log("Getting most changes in a day by author...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const lastDay = getLastDayOfYearStr();
+  const cmd = `git log --pretty=format:'BEGIN|{ "hash": "%h", "author_name": "%an", "date": "%ad"}' --date=short --since=${firstDayStr} --until=${lastDay} --shortstat --no-merges`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+  // 'BEGIN|{ "hash": "fe99b53d7f", "author_name": "Josh Story", "date": "2023-11-07"}',
+  // ' 53 files changed, 9380 insertions(+), 4566 deletions(-)',
+  const lines = stdout.split("\n").filter((l) => !!l);
+  type CommitChangeSummary = {
+    hash: string;
+    author_name: string;
+    date: string;
+    insertions: number;
+    deletions: number;
+    filesChanged: number;
+  };
+  let current: CommitChangeSummary = {
+    hash: "",
+    author_name: "",
+    date: "",
+    insertions: 0,
+    deletions: 0,
+    filesChanged: 0,
+  };
+  const lineChangesByCommit: CommitChangeSummary[] = [];
+
+  lines.forEach((line) => {
+    if (line.startsWith("BEGIN")) {
+      const jsonStr = line.split("|")[1];
+      current = JSON.parse(jsonStr);
+    } else {
+      const commitStats = getChangesFromGitLogStr(line);
+      lineChangesByCommit.push({ ...current, ...commitStats });
+    }
+  });
+
+  const mostChanges = lineChangesByCommit.reduce(
+    (acc: CommitChangeSummary, commit: CommitChangeSummary) => {
+      if (
+        commit.insertions + commit.deletions >
+        acc.insertions + acc.deletions
+      ) {
+        return commit;
+      } else {
+        return acc;
+      }
+    }
+  );
+  console.log("\n\n***** mostChanges *****\n", mostChanges, "\n\n");
+
+  return {
+    authorName: "",
+    insertions: 5,
+    deletions: 5,
+    date: "",
+  };
+}
+
+async function getLongestCommit(repo: Repo): Promise<LongestCommit> {
+  console.log("Getting longest commit...");
+
+  const firstDayStr = getFirstDayOfYearStr();
+  const cmd = `
+      mergestat "
+        select
+          hash,
+          length(message) as length,
+          author_name,
+          message,
+          author_when
+        from commits
+        order by length desc
+        limit 1;" -f json`;
+  const stdout = await runExec(cmd, {
+    cwd: repo.path,
+  });
+
+  return JSON.parse(stdout)[0] as LongestCommit;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -651,6 +810,8 @@ type RepoStats = {
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
+  highestCommitDayByAuthor: HighestCommitDaySummary;
+  longestCommit: LongestCommit;
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -671,6 +832,8 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     teamCommitsByMonth: stats.teamCommitsByMonth,
     teamCommitsByWeekDay: stats.teamCommitsByWeekDay,
     teamCommitsByHour: stats.teamCommitsByHour,
+    highestCommitDayByAuthor: stats.highestCommitDayByAuthor,
+    longestCommit: stats.longestCommit,
   };
 
   await db
@@ -714,6 +877,8 @@ async function task() {
       const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
       const teamCommitsByWeekDay = await getTeamCommitsByWeekDay(repo);
       const teamCommitsByHour = await getTeamCommitsByHour(repo);
+      const highestCommitDayByAuthor = await getHighestCommitDayByAuthor(repo);
+      const longestCommit = await getLongestCommit(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -728,6 +893,8 @@ async function task() {
         teamCommitsByMonth,
         teamCommitsByWeekDay,
         teamCommitsByHour,
+        highestCommitDayByAuthor,
+        longestCommit,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

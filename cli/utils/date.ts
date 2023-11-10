@@ -144,3 +144,14 @@ export function getHourDisplayName(hour: number): string {
 
   return map[hour] ?? "";
 }
+
+export function convertDateToUTC(date: Date) {
+  return new Date(
+    date.getUTCFullYear(),
+    date.getUTCMonth(),
+    date.getUTCDate(),
+    date.getUTCHours(),
+    date.getUTCMinutes(),
+    date.getUTCSeconds()
+  );
+}
