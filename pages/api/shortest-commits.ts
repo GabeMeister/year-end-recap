@@ -1,5 +1,5 @@
 import db from "@/src/db/client";
-import { LongestCommitQuery } from "@/src/hooks/endpoints/useLongestCommit";
+import { ShortestCommitsQuery } from "@/src/hooks/endpoints/useShortestCommits";
 import { NotFoundResponse } from "@/src/types/endpoints";
 import { Commit } from "@/src/types/git";
 import { sql } from "kysely";
@@ -7,12 +7,13 @@ import type { NextApiRequest, NextApiResponse } from "next";
 
 export default async function handler(
   req: NextApiRequest,
-  res: NextApiResponse<Commit | NotFoundResponse>
+  res: NextApiResponse<Commit[] | NotFoundResponse>
 ) {
-  const query: LongestCommitQuery = req.query as unknown as LongestCommitQuery;
+  const query: ShortestCommitsQuery =
+    req.query as unknown as ShortestCommitsQuery;
   const data = await db
     .selectFrom("repos")
-    .select(sql<Commit>`data->'longestCommit'`.as("longest_commit"))
+    .select(sql<Commit[]>`data->'shortestCommits'`.as("shortest_commits"))
     .where("id", "=", query.id)
     .limit(1)
     .execute();
@@ -24,5 +25,5 @@ export default async function handler(
     return;
   }
 
-  res.status(200).json(data[0].longest_commit);
+  res.status(200).json(data[0].shortest_commits);
 }

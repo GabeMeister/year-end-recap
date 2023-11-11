@@ -1,9 +1,9 @@
-import { useLongestCommit } from "@/src/hooks/endpoints/useLongestCommit";
+import { useAboutRepo } from "@/src/hooks/endpoints/useAboutRepo";
 import { useRouter } from "next/router";
 
 export default function AboutSlide() {
   const router = useRouter();
-  const { data, isLoading, error } = useLongestCommit({
+  const { data, isLoading, error } = useAboutRepo({
     id: parseInt((router.query?.project_id as string) ?? "0"),
   });
 

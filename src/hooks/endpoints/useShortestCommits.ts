@@ -2,14 +2,14 @@ import { Commit } from "@/src/types/git";
 import { get } from "@/src/utils/fetchers";
 import useSWR from "swr";
 
-export type LongestCommitQuery = {
+export type ShortestCommitsQuery = {
   id: number;
 };
 
-export function useLongestCommit({ id }: LongestCommitQuery) {
+export function useShortestCommits({ id }: ShortestCommitsQuery) {
   const { data, error, isLoading } = useSWR(
     {
-      endpoint: "/api/longest-commit",
+      endpoint: "/api/shortest-commits",
       query: {
         id,
       },
@@ -17,5 +17,5 @@ export function useLongestCommit({ id }: LongestCommitQuery) {
     get
   );
 
-  return { data: data as Commit, error, isLoading };
+  return { data: data as Commit[], error, isLoading };
 }

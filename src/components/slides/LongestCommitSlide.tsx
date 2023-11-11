@@ -9,10 +9,10 @@ export default function LongestCommitSlide() {
 
   return (
     <div className="LongestCommitSlide">
-      <h1>Longest Commits</h1>
+      <h1>Longest Commit</h1>
       <div>
         {data && (
-          <div>
+          <div className="overflow-hidden w-[600px]">
             <pre>{JSON.stringify(data, null, 2)}</pre>
           </div>
         )}
