@@ -28,10 +28,6 @@ export async function get(endpoint: string, query: object = {}) {
 }
 
 export async function post(endpoint: string, query: object = {}, body = {}) {
-  // if (defaultHeaders.csrfToken === '') {
-  //   throw new Error('CSRF Token not defined!');
-  // }
-
   return fetch(endpoint + "?" + stringifyQuery(query), {
     method: "POST",
     headers: {
