@@ -1,18 +1,21 @@
 export type RepoRecap = {
   version: number;
-  allTimeAuthorCommits: AuthorCommits[];
+
   newAuthors: TeamAuthorData;
   teamCommits: TeamCommitData;
   fileCount: FileCount;
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
+
   authorCommitsOverTime: AuthorCommitsOverTime;
+  allTimeAuthorCommits: AuthorCommits[];
   teamCommitsForYear: number;
   teamChangedLinesForYear: LineChangeStat;
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
   highestCommitDayByAuthor: HighestCommitDaySummary;
+
   longestCommit: Commit;
   shortestCommits: Commit[];
   commitMessageLengths: CommitMessageLength[];
@@ -140,4 +143,9 @@ export type AvgReleasesPerDay = {
 export type MostReleasesInDay = {
   count: number;
   date: string;
+};
+
+export type StatsQuery = {
+  id: number;
+  part: string;
 };

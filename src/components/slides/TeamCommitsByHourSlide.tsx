@@ -1,14 +1,14 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
-import { Commit } from "@/src/types/git";
+import { TeamCommitsByHour } from "@/src/types/git";
 
-export default function ShortestCommitsSlide() {
-  const { data, error, isLoading } = useStats<Commit[]>({
-    part: "shortestCommits",
+export default function TeamCommitsByHourSlide() {
+  const { data, error, isLoading } = useStats<TeamCommitsByHour>({
+    part: "teamCommitsByHour",
   });
 
   return (
-    <div className="ShortestCommitsSlide">
-      <h1>This is the ShortestCommitsSlide component!</h1>
+    <div className="TeamCommitsByHourSlide">
+      <h1>This is the TeamCommitsByHourSlide component!</h1>
       {data && (
         <div className="overflow-y-scroll h-[500px] w-[700px]">
           <pre>{JSON.stringify(data, null, 2)}</pre>

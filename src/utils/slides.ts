@@ -1,4 +1,4 @@
-import { ALL_SLIDES } from "../types/slides";
+import { ALL_SLIDES } from "@/src/utils/constants";
 
 export function getPrevSlide(currentSlide: string): string {
   if (!ALL_SLIDES.includes(currentSlide)) {

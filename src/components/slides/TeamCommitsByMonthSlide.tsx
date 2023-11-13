@@ -1,14 +1,14 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
-import { Commit } from "@/src/types/git";
+import { TeamCommitsByMonth } from "@/src/types/git";
 
-export default function ShortestCommitsSlide() {
-  const { data, error, isLoading } = useStats<Commit[]>({
-    part: "shortestCommits",
+export default function TeamCommitsByMonthSlide() {
+  const { data, error, isLoading } = useStats<TeamCommitsByMonth>({
+    part: "teamCommitsByMonth",
   });
 
   return (
-    <div className="ShortestCommitsSlide">
-      <h1>This is the ShortestCommitsSlide component!</h1>
+    <div className="TeamCommitsByMonthSlide">
+      <h1>This is the TeamCommitsByMonthSlide component!</h1>
       {data && (
         <div className="overflow-y-scroll h-[500px] w-[700px]">
           <pre>{JSON.stringify(data, null, 2)}</pre>
