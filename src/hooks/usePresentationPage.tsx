@@ -121,23 +121,31 @@ export default function usePresentationPage({
   function goToPrevSlide() {
     setIsNavigatingBackward(true);
 
-    router.push({
-      pathname: `/presentation/${id}`,
-      query: {
-        slide: prevSlide,
-      },
-    });
+    // To REALLY make sure the loading state of the button is showing, make sure
+    // this is done completely asynchronously
+    setTimeout(() => {
+      router.push({
+        pathname: `/presentation/${id}`,
+        query: {
+          slide: prevSlide,
+        },
+      });
+    }, 0);
   }
 
   function goToNextSlide() {
     setIsNavigatingForward(true);
 
-    router.push({
-      pathname: `/presentation/${id}`,
-      query: {
-        slide: nextSlide,
-      },
-    });
+    // To REALLY make sure the loading state of the button is showing, make sure
+    // this is done completely asynchronously
+    setTimeout(() => {
+      router.push({
+        pathname: `/presentation/${id}`,
+        query: {
+          slide: nextSlide,
+        },
+      });
+    }, 0);
   }
 
   return {
