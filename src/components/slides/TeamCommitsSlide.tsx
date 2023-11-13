@@ -1,7 +1,10 @@
-import { useTeamCommits } from "@/src/hooks/endpoints/useTeamCommits";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { TeamCommitData } from "@/src/types/git";
 
 export default function TeamCommitsSlide() {
-  const { data, isLoading, error } = useTeamCommits();
+  const { data, isLoading, error } = useStats<TeamCommitData>({
+    part: "teamCommits",
+  });
 
   return (
     <div className="TeamCommitsSlide">

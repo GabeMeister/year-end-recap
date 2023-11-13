@@ -1,7 +1,10 @@
-import { useLongestFiles } from "@/src/hooks/endpoints/useLongestFiles";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { LongestFiles } from "@/src/types/git";
 
 export default function LongestFilesSlide() {
-  const { data, error, isLoading } = useLongestFiles();
+  const { data, error, isLoading } = useStats<LongestFiles>({
+    part: "longestFiles",
+  });
 
   return (
     <div className="LongestFilesSlide">

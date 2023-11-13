@@ -1,7 +1,10 @@
-import { useAllTimeAuthorCommits } from "@/src/hooks/endpoints/useAllTimeAuthorCommits";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { AuthorCommits } from "@/src/types/git";
 
 export default function AllTimeAuthorCommitsSlide() {
-  const { data, error, isLoading } = useAllTimeAuthorCommits();
+  const { data, error, isLoading } = useStats<AuthorCommits[]>({
+    part: "allTimeAuthorCommits",
+  });
 
   return (
     <div className="AllTimeAuthorCommitsSlide">

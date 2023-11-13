@@ -1,7 +1,10 @@
-import { useAuthorCommitsOverTime } from "@/src/hooks/endpoints/useAuthorCommitsOverTime";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { AuthorCommitsOverTime } from "@/src/types/git";
 
 export default function AuthorCommitsOverTimeSlide() {
-  const { data, error, isLoading } = useAuthorCommitsOverTime();
+  const { data, error, isLoading } = useStats<AuthorCommitsOverTime>({
+    part: "authorCommitsOverTime",
+  });
 
   return (
     <div className="AuthorCommitsOverTimeSlide">

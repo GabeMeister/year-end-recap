@@ -1,7 +1,10 @@
-import { useFileCount } from "@/src/hooks/endpoints/useFileCount";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { FileCount } from "@/src/types/git";
 
 export default function FileCountSlide() {
-  const { data, error, isLoading } = useFileCount();
+  const { data, error, isLoading } = useStats<FileCount>({
+    part: "fileCount",
+  });
 
   return (
     <div className="FileCountSlide">

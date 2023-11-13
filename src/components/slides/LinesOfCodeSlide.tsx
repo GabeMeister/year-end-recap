@@ -1,7 +1,10 @@
-import { useLinesOfCode } from "@/src/hooks/endpoints/useLinesOfCode";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { LinesOfCode } from "@/src/types/git";
 
 export default function LinesOfCodeSlide() {
-  const { data, error, isLoading } = useLinesOfCode();
+  const { data, error, isLoading } = useStats<LinesOfCode>({
+    part: "linesOfCode",
+  });
 
   return (
     <div className="LinesOfCodeSlide">

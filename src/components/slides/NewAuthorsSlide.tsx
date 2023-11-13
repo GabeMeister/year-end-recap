@@ -1,8 +1,10 @@
-import { useNewAuthors } from "@/src/hooks/endpoints/useNewAuthors";
-import { useRouter } from "next/router";
+import { useStats } from "@/src/hooks/endpoints/useStats";
+import { TeamAuthorData } from "@/src/types/git";
 
 export default function NewAuthorsSlide() {
-  const { data, isLoading, error } = useNewAuthors();
+  const { data, isLoading, error } = useStats<TeamAuthorData>({
+    part: "newAuthors",
+  });
 
   return (
     <div className="NewAuthorsSlide">
