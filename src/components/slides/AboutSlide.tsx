@@ -1,5 +1,8 @@
 import { useAboutRepo } from "@/src/hooks/endpoints/useAboutRepo";
 import { useRouter } from "next/router";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faDatabase } from "@fortawesome/free-solid-svg-icons";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function AboutSlide() {
   const router = useRouter();
@@ -9,16 +12,16 @@ export default function AboutSlide() {
 
   return (
     <div className="AboutSlide">
-      <h1>About this Repo</h1>
-      <div>
+      <>
         {data && (
-          <div>
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+          <div className="flex items-center slide-fade-in">
+            <FontAwesomeIcon className="h-16 mr-6" icon={faDatabase} />
+            <h1 className="text-5xl">{data.name}</h1>
           </div>
         )}
         {isLoading && (
           <div>
-            <div>Loading...</div>
+            <LoadingSpinner />
           </div>
         )}
         {error && (
@@ -26,7 +29,7 @@ export default function AboutSlide() {
             <div>Error happened!</div>
           </div>
         )}
-      </div>
+      </>
     </div>
   );
 }

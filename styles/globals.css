@@ -3,5 +3,39 @@
 @tailwind utilities;
 
 body {
-  font-family: "Lato", sans-serif;
+  font-family: "Bitter", "Lato", sans-serif;
+}
+
+@keyframes slideAndFade {
+  0% {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-fade-in {
+  opacity: 0;
+  animation: slideAndFade 1s ease-in-out forwards;
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #666;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }

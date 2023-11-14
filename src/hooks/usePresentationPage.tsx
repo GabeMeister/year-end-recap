@@ -20,6 +20,7 @@ import ShortestCommitsSlide from "@/src/components/slides/ShortestCommitsSlide";
 import AvgReleasesPerDaySlide from "@/src/components/slides/AvgReleasesPerDaySlide";
 import MostReleasesInDaySlide from "@/src/components/slides/MostReleasesInDaySlide";
 import { getNextSlide, getPrevSlide } from "@/src/utils/slides";
+import useKeyboardShortcuts from "./useKeyboardShortcuts";
 
 type usePresentationPageParams = {
   id: number;
@@ -48,6 +49,21 @@ export default function usePresentationPage({
       router.events.off("routeChangeStart", handleRouteChange);
     };
   }, [router, setIsNavigatingBackward, setIsNavigatingForward]);
+
+  useKeyboardShortcuts([
+    {
+      event: { key: "ArrowLeft" },
+      callback: async () => {
+        goToPrevSlide();
+      },
+    },
+    {
+      event: { key: "ArrowRight" },
+      callback: async () => {
+        goToNextSlide();
+      },
+    },
+  ]);
 
   function getSlideComponent(slide: string) {
     let slideComponent: JSX.Element = <></>;

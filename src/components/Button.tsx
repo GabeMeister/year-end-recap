@@ -14,7 +14,7 @@ export default function Button({
   loading = false,
 }: ButtonProps) {
   const mergedCss = twMerge(
-    "Button py-2 px-4 text-white hover:bg-yer-blue-500 bg-yer-blue-400 animate transition-colors rounded-lg w-32 flex items-center justify-center",
+    "Button py-2 px-4 text-white hover:bg-yer-blue-500 bg-yer-blue-400 animate transition-colors rounded-lg w-28 flex items-center justify-center",
     className
   );
   const content = loading ? (
