@@ -19,23 +19,30 @@ import LongestCommitSlide from "@/src/components/slides/LongestCommitSlide";
 import ShortestCommitsSlide from "@/src/components/slides/ShortestCommitsSlide";
 import AvgReleasesPerDaySlide from "@/src/components/slides/AvgReleasesPerDaySlide";
 import MostReleasesInDaySlide from "@/src/components/slides/MostReleasesInDaySlide";
-import { getNextSlide, getPrevSlide } from "@/src/utils/slides";
+import {
+  ALL_SLIDE_PARTS,
+  getNextSlide,
+  getPrevSlide,
+  getSlide,
+} from "@/src/utils/slides";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
 
 type usePresentationPageParams = {
   id: number;
   slide: string;
+  part: string;
 };
 
 export default function usePresentationPage({
   id,
   slide,
+  part,
 }: usePresentationPageParams) {
   const router = useRouter();
   const [isNavigatingBackward, setIsNavigatingBackward] = useState(false);
   const [isNavigatingForward, setIsNavigatingForward] = useState(false);
-  const nextSlide = getNextSlide(slide);
-  const prevSlide = getPrevSlide(slide);
+  const nextSlide = getNextSlide(slide, part);
+  const prevSlide = getPrevSlide(slide, part);
 
   useEffect(() => {
     const handleRouteChange = (_url) => {
@@ -65,27 +72,32 @@ export default function usePresentationPage({
     },
   ]);
 
-  function getSlideComponent(slide: string) {
+  function getSlideComponent(slide: string, part: string) {
     let slideComponent: JSX.Element = <></>;
+    const slidePart = getSlide(slide, part);
 
-    switch (slide) {
+    if (!slidePart) {
+      return null;
+    }
+
+    switch (slidePart.slide) {
       case "about":
         slideComponent = <AboutSlide />;
         break;
       case "new_authors":
-        slideComponent = <NewAuthorsSlide />;
+        slideComponent = <NewAuthorsSlide part={slidePart.part} />;
         break;
       case "team_commits":
-        slideComponent = <TeamCommitsSlide />;
+        slideComponent = <TeamCommitsSlide part={slidePart.part} />;
         break;
       case "file_count":
-        slideComponent = <FileCountSlide />;
+        slideComponent = <FileCountSlide part={slidePart.part} />;
         break;
       case "lines_of_code":
-        slideComponent = <LinesOfCodeSlide />;
+        slideComponent = <LinesOfCodeSlide part={slidePart.part} />;
         break;
       case "longest_files":
-        slideComponent = <LongestFilesSlide />;
+        slideComponent = <LongestFilesSlide part={slidePart.part} />;
         break;
       case "author_commits_over_time":
         slideComponent = <AuthorCommitsOverTimeSlide />;
@@ -128,7 +140,9 @@ export default function usePresentationPage({
         break;
 
       default:
-        throw new Error("Slide is not found. This should not have happened.");
+        throw new Error(
+          "Could not map slide query param to component. This is an error in the codebase."
+        );
     }
 
     return slideComponent;
@@ -140,12 +154,15 @@ export default function usePresentationPage({
     // To REALLY make sure the loading state of the button is showing, make sure
     // this is done completely asynchronously
     setTimeout(() => {
-      router.push({
-        pathname: `/presentation/${id}`,
-        query: {
-          slide: prevSlide,
-        },
-      });
+      if (prevSlide) {
+        router.push({
+          pathname: `/presentation/${id}`,
+          query: {
+            slide: prevSlide.slide,
+            part: prevSlide.part,
+          },
+        });
+      }
     }, 0);
   }
 
@@ -155,19 +172,22 @@ export default function usePresentationPage({
     // To REALLY make sure the loading state of the button is showing, make sure
     // this is done completely asynchronously
     setTimeout(() => {
-      router.push({
-        pathname: `/presentation/${id}`,
-        query: {
-          slide: nextSlide,
-        },
-      });
+      if (nextSlide) {
+        router.push({
+          pathname: `/presentation/${id}`,
+          query: {
+            slide: nextSlide.slide,
+            part: nextSlide.part,
+          },
+        });
+      }
     }, 0);
   }
 
   return {
     isNavigatingBackward,
     isNavigatingForward,
-    slideComponent: getSlideComponent(slide),
+    slideComponent: getSlideComponent(slide, part),
     goToPrevSlide,
     goToNextSlide,
   };

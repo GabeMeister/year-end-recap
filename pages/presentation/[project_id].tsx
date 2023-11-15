@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import Head from "next/head";
 import Button from "@/src/components/Button";
-import { ALL_SLIDES } from "@/src/utils/constants";
+import { ALL_SLIDE_PARTS } from "@/src/utils/slides";
 import db from "@/src/db/client";
 import { getUrlPathWithQueryParams } from "@/src/utils/browser";
 
@@ -12,16 +12,21 @@ import usePresentationPage from "@/src/hooks/usePresentationPage";
 type PresentationPageProps = {
   id: number;
   slide: string;
+  part: string;
 };
 
-export default function PresentationPage({ id, slide }: PresentationPageProps) {
+export default function PresentationPage({
+  id,
+  slide,
+  part,
+}: PresentationPageProps) {
   const {
     isNavigatingBackward,
     isNavigatingForward,
     slideComponent,
     goToPrevSlide,
     goToNextSlide,
-  } = usePresentationPage({ id, slide });
+  } = usePresentationPage({ id, slide, part });
 
   return (
     <>
@@ -59,12 +64,19 @@ export async function getServerSideProps({
   // Verify that the project exists
   const id = params.project_id;
   const slide = query?.slide ?? "";
+  const part = query?.part ?? "";
+  const allSlideParts = ALL_SLIDE_PARTS;
 
-  if (!ALL_SLIDES.includes(slide)) {
+  if (
+    !allSlideParts.find(
+      (slidePart) => slidePart.slide === slide && slidePart.part === part
+    )
+  ) {
     return {
       redirect: {
         destination: getUrlPathWithQueryParams(`/presentation/${id}`, {
-          slide: "about",
+          slide: allSlideParts[0].slide,
+          part: allSlideParts[0].part,
         }),
         permanent: false,
       },
@@ -89,6 +101,7 @@ export async function getServerSideProps({
     props: {
       id: rows[0].id,
       slide,
+      part,
     },
   };
 }

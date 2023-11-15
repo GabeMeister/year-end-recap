@@ -1,23 +1,45 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamCommitData } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
-export default function TeamCommitsSlide() {
+type TeamCommitsSlideProps = {
+  part: string;
+};
+
+// ["title", "prev_year_number", "curr_year_number"]
+
+export default function TeamCommitsSlide({ part }: TeamCommitsSlideProps) {
   const { data, isLoading, error } = useStats<TeamCommitData>({
     part: "teamCommits",
   });
 
   return (
     <div className="TeamCommitsSlide">
-      <h1>Team Commits</h1>
       <div>
         {data && (
-          <div className="overflow-scroll h-96 w-[700px]">
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+          <div>
+            {part === "title" && (
+              <div>
+                <h1 className="text-5xl slide-fade-in">Team Commits</h1>
+              </div>
+            )}
+            {part === "prev_year_number" && (
+              <div>
+                <h1>Last Year</h1>
+                <div>{data.prevYear}</div>
+              </div>
+            )}
+            {part === "curr_year_number" && (
+              <div>
+                <h1>This Year</h1>
+                <div>{data.currYear}</div>
+              </div>
+            )}
           </div>
         )}
         {isLoading && (
           <div>
-            <div>Loading...</div>
+            <LoadingSpinner />
           </div>
         )}
         {error && (

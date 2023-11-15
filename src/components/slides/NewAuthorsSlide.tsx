@@ -1,23 +1,52 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamAuthorData } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
-export default function NewAuthorsSlide() {
+type NewAuthorsSlide = {
+  part: string;
+};
+
+export default function NewAuthorsSlide({ part }: NewAuthorsSlide) {
   const { data, isLoading, error } = useStats<TeamAuthorData>({
     part: "newAuthors",
   });
 
+  // previousYearCount: number;
+  // currentYearCount: number;
+
   return (
     <div className="NewAuthorsSlide">
-      <h1>New Engineers</h1>
       <div>
         {data && (
-          <div className="overflow-y-scroll h-96">
-            <pre>{JSON.stringify(data, null, 2)}</pre>
+          <div className="">
+            {part === "title" && (
+              <div>
+                <h1 className="text-5xl slide-fade-in">Team Size</h1>
+              </div>
+            )}
+            {part === "prev_year_number" && (
+              <div>
+                <div>Last year: {data.previousYearCount}</div>
+              </div>
+            )}
+            {part === "curr_year_number" && (
+              <div>
+                <div>This year: {data.currentYearCount}</div>
+              </div>
+            )}
+            {part === "list_names" && (
+              <div>
+                <div className="overflow-y-scroll h-96">
+                  <h1>Authors:</h1>
+                  <pre>{JSON.stringify(data.newAuthors, null, 2)}</pre>
+                </div>
+              </div>
+            )}
           </div>
         )}
         {isLoading && (
           <div>
-            <div>Loading...</div>
+            <LoadingSpinner />
           </div>
         )}
         {error && (

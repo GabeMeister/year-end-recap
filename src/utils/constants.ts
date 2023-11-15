@@ -22,3 +22,11 @@ export const ALL_SLIDES = [
   "most_releases_in_day",
   "avg_releases_per_day",
 ];
+
+export const SLIDE_PARTS = {
+  new_authors: ["title", "prev_year_number", "curr_year_number", "list_names"],
+  team_commits: ["title", "prev_year_number", "curr_year_number"],
+  file_count: ["title", "prev_year_number", "curr_year_number"],
+  lines_of_code: ["title", "prev_year_number", "curr_year_number"],
+  longest_files: ["title", "third_place", "second_place", "first_place"],
+};
