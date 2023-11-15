@@ -26,7 +26,7 @@ export default function Navbar(props: NavbarProps) {
             </span>
           </div>
         </Link>
-        <div className="hidden md:block">
+        <div className="md:block flex">
           <BasicLink href="/#how-does-it-work" className="text-lg mr-6">
             How it works
           </BasicLink>
@@ -34,6 +34,7 @@ export default function Navbar(props: NavbarProps) {
             About
           </BasicLink>
           <Button
+            className="inline-block"
             onClick={() => {
               router.push("/signup");
             }}

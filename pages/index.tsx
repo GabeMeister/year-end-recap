@@ -53,7 +53,7 @@ export default function Home() {
             />
           </div>
           <div className="m-auto text-center mt-12">
-            <SignUpButton className="m-auto">Sign Up Now</SignUpButton>
+            <SignUpButton className="m-auto w-56">Sign Up Now</SignUpButton>
           </div>
         </section>
 
@@ -110,7 +110,7 @@ export default function Home() {
               />
             </div>
             <div className="m-auto text-center mt-24">
-              <SignUpButton className="m-auto">Sign Up Now</SignUpButton>
+              <SignUpButton className="m-auto w-56">Sign Up Now</SignUpButton>
             </div>
           </div>
         </section>
@@ -193,8 +193,8 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="text-center mt-16">
-              <SignUpButton className="w-[230px]">See Your Stats</SignUpButton>
+            <div className="text-center mt-16 flex justify-center">
+              <SignUpButton className="w-[270px]">See Your Stats</SignUpButton>
             </div>
           </div>
         </section>
@@ -263,8 +263,8 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="text-center mt-16">
-              <SignUpButton>Try It Out</SignUpButton>
+            <div className="text-center mt-16 flex justify-center">
+              <SignUpButton className="w-[230px]">Try It Out</SignUpButton>
             </div>
           </div>
         </section>
