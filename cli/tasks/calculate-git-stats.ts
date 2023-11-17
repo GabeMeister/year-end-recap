@@ -44,7 +44,7 @@ import {
 import { RawCommit, getChangesFromGitLogStr } from "../utils/git";
 import { NumberObject } from "../../src/types/general";
 import { clone } from "../utils/object";
-import { CommonTableExpressionNameNode } from "kysely";
+import { getPrintFilesCmd } from "../utils/files";
 
 function getAuthorName(
   name: string,
@@ -332,7 +332,8 @@ async function getLongestFiles(repo: Repo): Promise<LongestFiles> {
   console.log("Getting longest files...");
 
   const includeFileStr = repo.includeFiles.map((f) => `'*.${f}'`).join(" ");
-  const cmd1 = `git ls-files ${includeFileStr} | xargs wc -l | sort -rh | head -n 4`;
+  const printFilesCmd = getPrintFilesCmd(repo.includeFiles, repo.excludeDirs);
+  const cmd1 = `${printFilesCmd} | sed 's/.*/"&"/' | xargs wc -l | sort -rh | grep -v ' total' | head -n 3`;
   const stdout1 = await runExec(cmd1, {
     cwd: repo.path,
   });
