@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { LinesOfCode } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 type LinesOfCodeSlideProps = {
   part: string;
@@ -35,7 +36,7 @@ export default function LinesOfCodeSlide({ part }: LinesOfCodeSlideProps) {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

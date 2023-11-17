@@ -1,4 +1,5 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function TeamCommitsForYearSlide() {
   const { data, error, isLoading } = useStats<number>({
@@ -15,7 +16,7 @@ export default function TeamCommitsForYearSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { MostReleasesInDay } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function MostReleasesInDaySlide() {
   const { data, error, isLoading } = useStats<MostReleasesInDay>({
@@ -16,7 +17,7 @@ export default function MostReleasesInDaySlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

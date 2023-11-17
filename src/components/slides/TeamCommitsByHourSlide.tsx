@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamCommitsByHour } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function TeamCommitsByHourSlide() {
   const { data, error, isLoading } = useStats<TeamCommitsByHour>({
@@ -16,7 +17,7 @@ export default function TeamCommitsByHourSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

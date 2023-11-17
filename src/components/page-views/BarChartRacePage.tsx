@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
-import data2 from "../../data/commits_over_time.json";
 import useEffectOnce from "@/src/hooks/useEffectOnce";
 import Head from "next/head";
 import { delay } from "@/src/utils/delay";

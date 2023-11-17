@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { LineChangeStat } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function TeamChangedLinesForYearSlide() {
   const { data, error, isLoading } = useStats<LineChangeStat>({
@@ -16,7 +17,7 @@ export default function TeamChangedLinesForYearSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

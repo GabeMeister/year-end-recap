@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { Commit } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function LongestCommitSlide() {
   const { data, error, isLoading } = useStats<Commit>({
@@ -16,7 +17,7 @@ export default function LongestCommitSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

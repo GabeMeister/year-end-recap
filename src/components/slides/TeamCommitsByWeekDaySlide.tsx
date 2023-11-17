@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamCommitsByWeekDay } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function TeamCommitsByWeekDaySlide() {
   const { data, error, isLoading } = useStats<TeamCommitsByWeekDay>({
@@ -16,7 +17,7 @@ export default function TeamCommitsByWeekDaySlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

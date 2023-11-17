@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { AvgReleasesPerDay } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function AvgReleasesPerDaySlide() {
   const { data, error, isLoading } = useStats<AvgReleasesPerDay>({
@@ -16,7 +17,7 @@ export default function AvgReleasesPerDaySlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

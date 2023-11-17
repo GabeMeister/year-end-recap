@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { AuthorCommits } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function AllTimeAuthorCommitsSlide() {
   const { data, error, isLoading } = useStats<AuthorCommits[]>({
@@ -16,7 +17,7 @@ export default function AllTimeAuthorCommitsSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

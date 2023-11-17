@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { HighestCommitDaySummary } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function HighestCommitDayByAuthorSlide() {
   const { data, error, isLoading } = useStats<HighestCommitDaySummary>({
@@ -16,7 +17,7 @@ export default function HighestCommitDayByAuthorSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

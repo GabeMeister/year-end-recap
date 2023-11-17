@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { CommitMessageLength } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function CommitMessageLengthsSlide() {
   const { data, error, isLoading } = useStats<CommitMessageLength[]>({
@@ -16,7 +17,7 @@ export default function CommitMessageLengthsSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

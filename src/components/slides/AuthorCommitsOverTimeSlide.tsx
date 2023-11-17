@@ -1,22 +1,44 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { AuthorCommitsOverTime } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
+import { useEffect } from "react";
+import paintRacingBarChart from "@/src/utils/racing-bar-chart";
 
 export default function AuthorCommitsOverTimeSlide() {
-  const { data, error, isLoading } = useStats<AuthorCommitsOverTime>({
+  const {
+    data: commitsOverTime,
+    error,
+    isLoading,
+  } = useStats<AuthorCommitsOverTime>({
     part: "authorCommitsOverTime",
   });
 
+  useEffect(() => {
+    if (!commitsOverTime) {
+      return;
+    }
+
+    if (!!document.querySelector("#racing-bar-chart svg")) {
+      return;
+    }
+
+    paintRacingBarChart({ commitsOverTime, width: 1000 });
+
+    return () => {
+      document.querySelector("#racing-bar-chart svg")?.remove();
+    };
+  }, [commitsOverTime]);
+
   return (
     <div className="AuthorCommitsOverTimeSlide">
-      <h1>This is the AuthorCommitsOverTimeSlide component!</h1>
-      {data && (
-        <div className="overflow-y-scroll h-[500px] w-[700px]">
-          <pre>{JSON.stringify(data, null, 2)}</pre>
+      {commitsOverTime && (
+        <div className="overflow-y-scroll w-[1000px]">
+          <div id="racing-bar-chart" />
         </div>
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

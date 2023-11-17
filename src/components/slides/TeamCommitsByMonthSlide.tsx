@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamCommitsByMonth } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 export default function TeamCommitsByMonthSlide() {
   const { data, error, isLoading } = useStats<TeamCommitsByMonth>({
@@ -16,7 +17,7 @@ export default function TeamCommitsByMonthSlide() {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (

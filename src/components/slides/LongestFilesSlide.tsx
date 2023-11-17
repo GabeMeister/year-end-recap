@@ -1,5 +1,6 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { LongestFiles } from "@/src/types/git";
+import LoadingSpinner from "../LoadingSpinner";
 
 type LongestFilesSlideProps = {
   part: string;
@@ -44,7 +45,7 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
       )}
       {isLoading && (
         <div>
-          <div>Loading...</div>
+          <LoadingSpinner />
         </div>
       )}
       {error && (
