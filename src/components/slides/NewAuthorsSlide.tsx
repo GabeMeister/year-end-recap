@@ -1,6 +1,7 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { TeamAuthorData } from "@/src/types/git";
 import LoadingSpinner from "../LoadingSpinner";
+import getPercentDifference from "@/src/utils/math";
 
 type NewAuthorsSlide = {
   part: string;
@@ -32,6 +33,17 @@ export default function NewAuthorsSlide({ part }: NewAuthorsSlide) {
             {part === "curr_year_number" && (
               <div>
                 <div>This year: {data.currentYearCount}</div>
+              </div>
+            )}
+            {part === "percent_increase" && (
+              <div>
+                <div>
+                  {getPercentDifference(
+                    data.previousYearCount,
+                    data.currentYearCount
+                  )}{" "}
+                  difference!
+                </div>
               </div>
             )}
             {part === "list_names" && (

@@ -100,10 +100,10 @@ export default function usePresentationPage({
         slideComponent = <LongestFilesSlide part={slidePart.part} />;
         break;
       case "author_commits_over_time":
-        slideComponent = <AuthorCommitsOverTimeSlide />;
+        slideComponent = <AuthorCommitsOverTimeSlide part={slidePart.part} />;
         break;
       case "all_time_author_commits":
-        slideComponent = <AllTimeAuthorCommitsSlide />;
+        slideComponent = <AllTimeAuthorCommitsSlide part={slidePart.part} />;
         break;
       case "team_commits_for_year":
         slideComponent = <TeamCommitsForYearSlide />;

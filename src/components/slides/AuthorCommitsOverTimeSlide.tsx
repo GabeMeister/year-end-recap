@@ -4,7 +4,13 @@ import LoadingSpinner from "../LoadingSpinner";
 import { useEffect } from "react";
 import paintRacingBarChart from "@/src/utils/racing-bar-chart";
 
-export default function AuthorCommitsOverTimeSlide() {
+type AuthorCommitsOverTimeSlide = {
+  part: string;
+};
+
+export default function AuthorCommitsOverTimeSlide({
+  part,
+}: AuthorCommitsOverTimeSlide) {
   const {
     data: commitsOverTime,
     error,
@@ -27,14 +33,25 @@ export default function AuthorCommitsOverTimeSlide() {
     return () => {
       document.querySelector("#racing-bar-chart svg")?.remove();
     };
-  }, [commitsOverTime]);
+  }, [commitsOverTime, part]);
 
   return (
     <div className="AuthorCommitsOverTimeSlide">
       {commitsOverTime && (
-        <div className="overflow-y-scroll w-[1000px]">
-          <div id="racing-bar-chart" />
-        </div>
+        <>
+          {part === "title" && (
+            <div>
+              <h1 className="text-5xl slide-fade-in">
+                Author Commits Over Time
+              </h1>
+            </div>
+          )}
+          {part === "main" && (
+            <div className="overflow-y-scroll w-[1000px]">
+              <div id="racing-bar-chart" />
+            </div>
+          )}
+        </>
       )}
       {isLoading && (
         <div>

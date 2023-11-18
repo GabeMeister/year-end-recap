@@ -12,6 +12,7 @@ export default function LoadingSpinner({
   return (
     <div className="LoadingSpinner">
       <Image
+        priority
         src="/images/loading-spinner.svg"
         width={width}
         height={height}

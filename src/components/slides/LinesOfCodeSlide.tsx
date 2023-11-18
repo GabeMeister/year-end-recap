@@ -1,6 +1,7 @@
 import { useStats } from "@/src/hooks/endpoints/useStats";
 import { LinesOfCode } from "@/src/types/git";
 import LoadingSpinner from "../LoadingSpinner";
+import getPercentDifference from "@/src/utils/math";
 
 type LinesOfCodeSlideProps = {
   part: string;
@@ -30,6 +31,11 @@ export default function LinesOfCodeSlide({ part }: LinesOfCodeSlideProps) {
             <div>
               <h1>This Year</h1>
               <div>{data.currYear}</div>
+            </div>
+          )}
+          {part === "percent_increase" && (
+            <div>
+              {getPercentDifference(data.prevYear, data.currYear)} difference!
             </div>
           )}
         </div>
