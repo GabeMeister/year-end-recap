@@ -9,8 +9,6 @@ export const ALL_SLIDES = [
 
   "author_commits_over_time",
   "all_time_author_commits",
-  "team_commits_for_year",
-  "team_changed_lines_for_year",
   "team_commits_by_month",
   "team_commits_by_week_day",
   "team_commits_by_hour",
@@ -53,8 +51,6 @@ export const SLIDE_PARTS = {
 
   author_commits_over_time: ["title", "main"],
   all_time_author_commits: ["title", "main"],
-  team_commits_for_year: ["title", "main"],
-  team_changed_lines_for_year: ["title", "main"],
   team_commits_by_month: ["title", "main"],
   team_commits_by_week_day: ["title", "main"],
   team_commits_by_hour: ["title", "main"],

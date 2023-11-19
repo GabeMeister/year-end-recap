@@ -33,7 +33,7 @@ export default function AllTimeAuthorCommitsSlide({
       return;
     }
 
-    if (!!document.querySelector("#racing-bar-chart svg")) {
+    if (!!document.querySelector("#bar-chart svg")) {
       return;
     }
 

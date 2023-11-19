@@ -8,8 +8,6 @@ import LinesOfCodeSlide from "@/src/components/slides/LinesOfCodeSlide";
 import LongestFilesSlide from "@/src/components/slides/LongestFilesSlide";
 import AuthorCommitsOverTimeSlide from "@/src/components/slides/AuthorCommitsOverTimeSlide";
 import AllTimeAuthorCommitsSlide from "@/src/components/slides/AllTimeAuthorCommitsSlide";
-import TeamCommitsForYearSlide from "@/src/components/slides/TeamCommitsForYearSlide";
-import TeamChangedLinesForYearSlide from "@/src/components/slides/TeamChangedLinesForYearSlide";
 import TeamCommitsByMonthSlide from "@/src/components/slides/TeamCommitsByMonthSlide";
 import TeamCommitsByWeekDaySlide from "@/src/components/slides/TeamCommitsByWeekDaySlide";
 import TeamCommitsByHourSlide from "@/src/components/slides/TeamCommitsByHourSlide";
@@ -105,20 +103,14 @@ export default function usePresentationPage({
       case "all_time_author_commits":
         slideComponent = <AllTimeAuthorCommitsSlide part={slidePart.part} />;
         break;
-      case "team_commits_for_year":
-        slideComponent = <TeamCommitsForYearSlide />;
-        break;
-      case "team_changed_lines_for_year":
-        slideComponent = <TeamChangedLinesForYearSlide />;
-        break;
       case "team_commits_by_month":
-        slideComponent = <TeamCommitsByMonthSlide />;
+        slideComponent = <TeamCommitsByMonthSlide part={slidePart.part} />;
         break;
       case "team_commits_by_week_day":
-        slideComponent = <TeamCommitsByWeekDaySlide />;
+        slideComponent = <TeamCommitsByWeekDaySlide part={slidePart.part} />;
         break;
       case "team_commits_by_hour":
-        slideComponent = <TeamCommitsByHourSlide />;
+        slideComponent = <TeamCommitsByHourSlide part={slidePart.part} />;
         break;
       case "highest_commit_day_by_author":
         slideComponent = <HighestCommitDayByAuthorSlide />;
