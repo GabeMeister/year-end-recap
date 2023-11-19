@@ -38,7 +38,7 @@ export default function TeamCommitsSlide({ part }: TeamCommitsSlideProps) {
             )}
             {part === "percent_increase" && (
               <div>
-                {getPercentDifference(data.prevYear, data.currYear)} difference!
+                {getPercentDifference(data.prevYear, data.currYear)} increase!
               </div>
             )}
           </div>

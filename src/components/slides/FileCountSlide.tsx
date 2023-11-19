@@ -35,7 +35,7 @@ export default function FileCountSlide({ part }: FileCountSlideProps) {
           )}
           {part === "percent_increase" && (
             <div>
-              {getPercentDifference(data.prevYear, data.currYear)} difference!
+              {getPercentDifference(data.prevYear, data.currYear)} increase!
             </div>
           )}
         </div>

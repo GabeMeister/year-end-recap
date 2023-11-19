@@ -9,8 +9,6 @@ export type RepoRecap = {
 
   authorCommitsOverTime: AuthorCommitsOverTime;
   allTimeAuthorCommits: AuthorCommits[];
-  teamCommitsForYear: number;
-  teamChangedLinesForYear: LineChangeStat;
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;

@@ -35,7 +35,7 @@ export default function LinesOfCodeSlide({ part }: LinesOfCodeSlideProps) {
           )}
           {part === "percent_increase" && (
             <div>
-              {getPercentDifference(data.prevYear, data.currYear)} difference!
+              {getPercentDifference(data.prevYear, data.currYear)} increase!
             </div>
           )}
         </div>

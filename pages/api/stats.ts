@@ -108,24 +108,6 @@ export default async function handler(
         .limit(1)
         .execute();
       break;
-    case "teamCommitsForYear":
-      data = await db
-        .selectFrom("repos")
-        .select(sql<number>`data->'teamCommitsForYear'`.as("stats"))
-        .where("id", "=", id)
-        .limit(1)
-        .execute();
-      break;
-    case "teamChangedLinesForYear":
-      data = await db
-        .selectFrom("repos")
-        .select(
-          sql<LineChangeStat>`data->'teamChangedLinesForYear'`.as("stats")
-        )
-        .where("id", "=", id)
-        .limit(1)
-        .execute();
-      break;
     case "teamCommitsByMonth":
       data = await db
         .selectFrom("repos")

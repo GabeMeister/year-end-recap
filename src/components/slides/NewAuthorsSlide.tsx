@@ -42,7 +42,7 @@ export default function NewAuthorsSlide({ part }: NewAuthorsSlide) {
                     data.previousYearCount,
                     data.currentYearCount
                   )}{" "}
-                  difference!
+                  increase!
                 </div>
               </div>
             )}

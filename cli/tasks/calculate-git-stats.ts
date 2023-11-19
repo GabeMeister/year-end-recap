@@ -3,8 +3,8 @@ import {
   convertDateToUTC,
   createDateMap,
   getDateStr,
+  getFirstDayOfYear,
   getHourDisplayName,
-  getLastDayOfYear,
   getLastDayOfYearStr,
   getMonthDisplayName,
   getWeekdayDisplayName,
@@ -359,9 +359,8 @@ async function getGitAuthorCommits(
   authorsToInclude: string[]
 ): Promise<RawCommit[]> {
   const authorSqlStr = authorsToInclude.map((a) => `'${a}'`).join(",");
-  const beginningOfYear = getFirstDayOfYearStr();
   const stdout = await runExec(
-    `mergestat "SELECT author_name as name, author_when as date FROM commits where author_when >= '${beginningOfYear}' and author_name in (${authorSqlStr}) order by author_when" -f json`,
+    `mergestat "SELECT author_name as name, author_when as date FROM commits where author_name in (${authorSqlStr}) order by author_when" -f json`,
     {
       cwd: repo,
     }
@@ -453,7 +452,11 @@ async function getAuthorCommitsOverTime(
     }
   }
 
-  return cumulativeCommits;
+  const firstDayOfYear = getFirstDayOfYear();
+
+  return cumulativeCommits.filter((c) => {
+    return new Date(c.date) >= firstDayOfYear;
+  });
 }
 
 async function getTeamCommitsForYear(repo: Repo): Promise<number> {
@@ -887,8 +890,6 @@ type RepoStats = {
   linesOfCode: LinesOfCode;
   longestFiles: LongestFiles;
   authorCommitsOverTime: AuthorCommitsOverTime;
-  teamCommitsForYear: number;
-  teamChangedLinesForYear: LineChangeStat;
   teamCommitsByMonth: TeamCommitsByMonth;
   teamCommitsByWeekDay: TeamCommitsByWeekDay;
   teamCommitsByHour: TeamCommitsByHour;
@@ -913,8 +914,6 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     linesOfCode: stats.linesOfCode,
     longestFiles: stats.longestFiles,
     authorCommitsOverTime: stats.authorCommitsOverTime,
-    teamCommitsForYear: stats.teamCommitsForYear,
-    teamChangedLinesForYear: stats.teamChangedLinesForYear,
     teamCommitsByMonth: stats.teamCommitsByMonth,
     teamCommitsByWeekDay: stats.teamCommitsByWeekDay,
     teamCommitsByHour: stats.teamCommitsByHour,
@@ -962,8 +961,6 @@ async function task() {
       const linesOfCode = await getLinesOfCode(repo);
       const longestFiles = await getLongestFiles(repo);
       const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
-      const teamCommitsForYear = await getTeamCommitsForYear(repo);
-      const teamChangedLinesForYear = await getTeamChangedLinesForYear(repo);
       const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
       const teamCommitsByWeekDay = await getTeamCommitsByWeekDay(repo);
       const teamCommitsByHour = await getTeamCommitsByHour(repo);
@@ -982,8 +979,6 @@ async function task() {
         linesOfCode,
         longestFiles,
         authorCommitsOverTime,
-        teamCommitsForYear,
-        teamChangedLinesForYear,
         teamCommitsByMonth,
         teamCommitsByWeekDay,
         teamCommitsByHour,
