@@ -100,9 +100,6 @@ export default function usePresentationPage({
       case "author_commits_over_time":
         slideComponent = <AuthorCommitsOverTimeSlide part={slidePart.part} />;
         break;
-      case "all_time_author_commits":
-        slideComponent = <AllTimeAuthorCommitsSlide part={slidePart.part} />;
-        break;
       case "team_commits_by_month":
         slideComponent = <TeamCommitsByMonthSlide part={slidePart.part} />;
         break;
@@ -113,10 +110,12 @@ export default function usePresentationPage({
         slideComponent = <TeamCommitsByHourSlide part={slidePart.part} />;
         break;
       case "highest_commit_day_by_author":
-        slideComponent = <HighestCommitDayByAuthorSlide />;
+        slideComponent = (
+          <HighestCommitDayByAuthorSlide part={slidePart.part} />
+        );
         break;
       case "longest_commit":
-        slideComponent = <LongestCommitSlide />;
+        slideComponent = <LongestCommitSlide part={slidePart.part} />;
         break;
       case "shortest_commits":
         slideComponent = <ShortestCommitsSlide />;

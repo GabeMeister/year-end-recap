@@ -8,7 +8,6 @@ export const ALL_SLIDES = [
   "longest_files",
 
   "author_commits_over_time",
-  "all_time_author_commits",
   "team_commits_by_month",
   "team_commits_by_week_day",
   "team_commits_by_hour",
@@ -50,13 +49,12 @@ export const SLIDE_PARTS = {
   longest_files: ["title", "third_place", "second_place", "first_place"],
 
   author_commits_over_time: ["title", "main"],
-  all_time_author_commits: ["title", "main"],
   team_commits_by_month: ["title", "main"],
   team_commits_by_week_day: ["title", "main"],
   team_commits_by_hour: ["title", "main"],
-  highest_commit_day_by_author: ["title", "main"],
+  highest_commit_day_by_author: ["title", "author", "commits"],
 
-  longest_commit: ["title", "main"],
+  longest_commit: ["title", "author", "commit"],
   shortest_commits: ["title", "main"],
   commit_message_lengths: ["title", "main"],
   most_releases_in_day: ["title", "main"],
