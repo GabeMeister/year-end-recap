@@ -118,7 +118,7 @@ export default function usePresentationPage({
         slideComponent = <LongestCommitSlide part={slidePart.part} />;
         break;
       case "shortest_commits":
-        slideComponent = <ShortestCommitsSlide />;
+        slideComponent = <ShortestCommitsSlide part={slidePart.part} />;
         break;
       case "commit_message_lengths":
         slideComponent = <CommitMessageLengthsSlide />;

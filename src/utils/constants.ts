@@ -55,7 +55,7 @@ export const SLIDE_PARTS = {
   highest_commit_day_by_author: ["title", "author", "commits"],
 
   longest_commit: ["title", "author", "commit"],
-  shortest_commits: ["title", "main"],
+  shortest_commits: ["title", "first", "second", "third", "fourth", "fifth"],
   commit_message_lengths: ["title", "main"],
   most_releases_in_day: ["title", "main"],
   avg_releases_per_day: ["title", "main"],
