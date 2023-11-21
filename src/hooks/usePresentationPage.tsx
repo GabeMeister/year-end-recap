@@ -121,7 +121,7 @@ export default function usePresentationPage({
         slideComponent = <ShortestCommitsSlide part={slidePart.part} />;
         break;
       case "commit_message_lengths":
-        slideComponent = <CommitMessageLengthsSlide />;
+        slideComponent = <CommitMessageLengthsSlide part={slidePart.part} />;
         break;
       case "avg_releases_per_day":
         slideComponent = <AvgReleasesPerDaySlide />;
