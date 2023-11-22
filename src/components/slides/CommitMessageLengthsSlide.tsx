@@ -85,12 +85,9 @@ export default function CommitMessageLengthsSlide({
     svg
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(d3.axisBottom(x).tickSizeOuter(0))
+      .call(d3.axisBottom(x).tickValues(["50", "100", "150"]).tickSizeOuter(0))
       .selectAll("text")
-      .attr("font-size", "14px")
-      .attr("dx", "2em")
-      .attr("dy", "2rem")
-      .attr("transform", "rotate(30)");
+      .attr("font-size", "14px");
 
     /*
      * Y AXIS
@@ -98,7 +95,12 @@ export default function CommitMessageLengthsSlide({
     svg
       .append("g")
       .attr("transform", `translate(${marginLeft},0)`)
-      .call(d3.axisLeft(y).tickFormat((y) => (y as number).toLocaleString()))
+      .call(
+        d3
+          .axisLeft(y)
+          .tickFormat((y) => (y as number).toLocaleString())
+          .ticks(5)
+      )
       .call((g) => g.selectAll("text").attr("font-size", "14px"))
       .call((g) => g.select(".domain").remove())
       .call((g) =>
@@ -158,8 +160,8 @@ export default function CommitMessageLengthsSlide({
       {commits && (
         <>
           {part === "main" && (
-            <div className="overflow-y-scroll h-[700px] w-[1210px]">
-              <div id="bar-chart" className="shadow-2xl" />
+            <div className="h-[700px] w-[1210px]">
+              <div id="bar-chart" className="" />
             </div>
           )}
         </>
