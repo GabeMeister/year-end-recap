@@ -19,7 +19,7 @@ export default function HighestCommitDayByAuthorSlide({
         <>
           {part === "title" && (
             <div>
-              <h1 className="text-5xl slide-fade-in">Most Commits in 1 Day</h1>
+              <h1 className="text-5xl slide-fade-in">Most Commits in a Day</h1>
             </div>
           )}
           {part === "author" && (

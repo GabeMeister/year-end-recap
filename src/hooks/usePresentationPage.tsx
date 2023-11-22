@@ -22,6 +22,8 @@ import {
   getNextSlide,
   getPrevSlide,
   getSlide,
+  isFirstSlide,
+  isLastSlide,
 } from "@/src/utils/slides";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
 
@@ -124,10 +126,10 @@ export default function usePresentationPage({
         slideComponent = <CommitMessageLengthsSlide part={slidePart.part} />;
         break;
       case "avg_releases_per_day":
-        slideComponent = <AvgReleasesPerDaySlide />;
+        slideComponent = <AvgReleasesPerDaySlide part={slidePart.part} />;
         break;
       case "most_releases_in_day":
-        slideComponent = <MostReleasesInDaySlide />;
+        slideComponent = <MostReleasesInDaySlide part={slidePart.part} />;
         break;
 
       default:
@@ -181,5 +183,7 @@ export default function usePresentationPage({
     slideComponent: getSlideComponent(slide, part),
     goToPrevSlide,
     goToNextSlide,
+    isFirstSlide: isFirstSlide(slide, part),
+    isLastSlide: isLastSlide(slide, part),
   };
 }

@@ -29,7 +29,7 @@ export default function LongestCommitSlide({ part }: LongestCommitSlideProps) {
           )}
           {part === "commit" && (
             <div className="overflow-y-scroll h-[600px] w-[900px]">
-              <pre>{data.message}</pre>
+              <pre className="whitespace-pre-wrap">{data.message}</pre>
               <br />
               <span className="text-yellow-200 italic">{`(${data.length.toLocaleString()} characters)`}</span>
             </div>

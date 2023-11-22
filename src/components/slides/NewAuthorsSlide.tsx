@@ -3,11 +3,11 @@ import { TeamAuthorData } from "@/src/types/git";
 import LoadingSpinner from "../LoadingSpinner";
 import getPercentDifference from "@/src/utils/math";
 
-type NewAuthorsSlide = {
+type NewAuthorsSlideProps = {
   part: string;
 };
 
-export default function NewAuthorsSlide({ part }: NewAuthorsSlide) {
+export default function NewAuthorsSlide({ part }: NewAuthorsSlideProps) {
   const { data, isLoading, error } = useStats<TeamAuthorData>({
     part: "newAuthors",
   });

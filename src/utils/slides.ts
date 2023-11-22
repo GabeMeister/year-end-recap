@@ -75,3 +75,31 @@ export function getNextSlide(
 
   return getSlideAtIdx(nextIdx);
 }
+
+export function isFirstSlide(
+  currentSlide: string,
+  currentPart: string
+): boolean {
+  const slideIdx = getSlideIdx(currentSlide, currentPart);
+  if (slideIdx === -1) {
+    throw new Error(
+      `Unable to find slide idx for: ${currentSlide}, ${currentPart}`
+    );
+  }
+
+  return slideIdx === 0;
+}
+
+export function isLastSlide(
+  currentSlide: string,
+  currentPart: string
+): boolean {
+  const slideIdx = getSlideIdx(currentSlide, currentPart);
+  if (slideIdx === -1) {
+    throw new Error(
+      `Unable to find slide idx for: ${currentSlide}, ${currentPart}`
+    );
+  }
+
+  return ALL_SLIDE_PARTS.length - 1 === slideIdx;
+}

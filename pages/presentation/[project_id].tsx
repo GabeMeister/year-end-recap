@@ -26,6 +26,8 @@ export default function PresentationPage({
     slideComponent,
     goToPrevSlide,
     goToNextSlide,
+    isFirstSlide,
+    isLastSlide,
   } = usePresentationPage({ id, slide, part });
 
   return (
@@ -36,7 +38,7 @@ export default function PresentationPage({
       </Head>
       <div className="PresentationPage p-6 bg-gray-800 h-screen w-screen flex justify-between items-center text-gray-300">
         <Button
-          className="w-12"
+          className={`w-12 ${isFirstSlide ? "invisible" : "block"}`}
           loading={isNavigatingBackward}
           onClick={goToPrevSlide}
         >
@@ -46,7 +48,7 @@ export default function PresentationPage({
           {slideComponent}
         </div>
         <Button
-          className="w-12"
+          className={`w-12 ${isLastSlide ? "invisible" : "block"}`}
           loading={isNavigatingForward}
           onClick={goToNextSlide}
         >
