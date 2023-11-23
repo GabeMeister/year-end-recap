@@ -35,6 +35,14 @@ export default function CommitMessageLengthsSlide({
       return;
     }
 
+    const tooltip = d3
+      .select("body")
+      .append("div")
+      .attr("class", "tooltip px-3 py-1 rounded-sm")
+      .style("opacity", 0)
+      .style("position", "absolute")
+      .style("background-color", "white");
+
     // We want the shortest commits first
     commits?.reverse();
 
@@ -79,13 +87,22 @@ export default function CommitMessageLengthsSlide({
       .attr("height", "100%")
       .attr("width", "100%");
 
+    const lengths = commits.map((c) => c.length).sort((a, b) => a - b);
+
+    // Round to the nearest interval of "50" for the x axis
+    const percentiles = [
+      (Math.round((d3.quantile(lengths, 0.25) ?? 0) / 50) * 50).toString(),
+      (Math.round((d3.quantile(lengths, 0.5) ?? 0) / 50) * 50).toString(),
+      (Math.round((d3.quantile(lengths, 0.75) ?? 0) / 50) * 50).toString(),
+    ];
+
     /*
      * X AXIS
      */
     svg
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
-      .call(d3.axisBottom(x).tickValues(["50", "100", "150"]).tickSizeOuter(0))
+      .call(d3.axisBottom(x).tickValues(percentiles).tickSizeOuter(0))
       .selectAll("text")
       .attr("font-size", "14px");
 
@@ -131,7 +148,22 @@ export default function CommitMessageLengthsSlide({
       .attr("height", (_d) => {
         return 0;
       })
-      .attr("width", x.bandwidth() - 2);
+      .attr("width", x.bandwidth())
+      .on("mouseover", (event, d) => {
+        tooltip.style("opacity", 0.9);
+        tooltip
+          .html(`Length: ${d.length} <br /> Frequency: ${d.frequency}`)
+          .style("left", event.pageX - 50 + "px")
+          .style("top", event.pageY - 100 + "px");
+      })
+      .on("mousemove", (event, d) => {
+        tooltip
+          .style("left", event.pageX - 50 + "px")
+          .style("top", event.pageY - 100 + "px");
+      })
+      .on("mouseout", (d) => {
+        tooltip.style("opacity", 0);
+      });
 
     /*
      * BAR ANIMATION
@@ -140,7 +172,7 @@ export default function CommitMessageLengthsSlide({
       .selectAll("#bars rect")
       .transition()
       .ease(d3.easeBackOut)
-      .duration(800)
+      .duration(600)
       .attr("y", function (d) {
         return y((d as any).frequency);
       })
@@ -151,7 +183,7 @@ export default function CommitMessageLengthsSlide({
         return zero - yValue;
       })
       .delay(function (_d, i) {
-        return i * 20;
+        return i * 5;
       });
   }, [commits, part]);
 
