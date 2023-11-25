@@ -7,7 +7,6 @@ import FileCountSlide from "@/src/components/slides/FileCountSlide";
 import LinesOfCodeSlide from "@/src/components/slides/LinesOfCodeSlide";
 import LongestFilesSlide from "@/src/components/slides/LongestFilesSlide";
 import AuthorCommitsOverTimeSlide from "@/src/components/slides/AuthorCommitsOverTimeSlide";
-import AllTimeAuthorCommitsSlide from "@/src/components/slides/AllTimeAuthorCommitsSlide";
 import TeamCommitsByMonthSlide from "@/src/components/slides/TeamCommitsByMonthSlide";
 import TeamCommitsByWeekDaySlide from "@/src/components/slides/TeamCommitsByWeekDaySlide";
 import TeamCommitsByHourSlide from "@/src/components/slides/TeamCommitsByHourSlide";
@@ -18,7 +17,6 @@ import ShortestCommitsSlide from "@/src/components/slides/ShortestCommitsSlide";
 import AvgReleasesPerDaySlide from "@/src/components/slides/AvgReleasesPerDaySlide";
 import MostReleasesInDaySlide from "@/src/components/slides/MostReleasesInDaySlide";
 import {
-  ALL_SLIDE_PARTS,
   getNextSlide,
   getPrevSlide,
   getSlide,
@@ -26,6 +24,7 @@ import {
   isLastSlide,
 } from "@/src/utils/slides";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
+import EndingSlide from "../components/slides/EndingSlide";
 
 type usePresentationPageParams = {
   id: number;
@@ -130,6 +129,9 @@ export default function usePresentationPage({
         break;
       case "most_releases_in_day":
         slideComponent = <MostReleasesInDaySlide part={slidePart.part} />;
+        break;
+      case "ending":
+        slideComponent = <EndingSlide part={slidePart.part} />;
         break;
 
       default:

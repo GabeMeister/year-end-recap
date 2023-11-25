@@ -18,6 +18,7 @@ export const ALL_SLIDES = [
   "commit_message_lengths",
   "avg_releases_per_day",
   "most_releases_in_day",
+  "ending",
 ];
 
 export const SLIDE_PARTS = {
@@ -59,4 +60,5 @@ export const SLIDE_PARTS = {
   commit_message_lengths: ["main"],
   avg_releases_per_day: ["title", "main"],
   most_releases_in_day: ["title", "main"],
+  ending: ["main"],
 };
