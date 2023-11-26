@@ -19,7 +19,7 @@ export default function LinesOfCodeSlide({ part }: LinesOfCodeSlideProps) {
         <>
           {part === "title" && (
             <div>
-              <h1 className="text-5xl slide-fade-in">Team Commits</h1>
+              <h1 className="text-5xl slide-fade-in">Total Lines of Code</h1>
             </div>
           )}
           {part === "prev_year_number" && (

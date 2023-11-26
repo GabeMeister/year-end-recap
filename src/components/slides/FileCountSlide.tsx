@@ -19,7 +19,7 @@ export default function FileCountSlide({ part }: FileCountSlideProps) {
         <>
           {part === "title" && (
             <div>
-              <h1 className="text-5xl slide-fade-in">Team Commits</h1>
+              <h1 className="text-5xl slide-fade-in">File Count</h1>
             </div>
           )}
           {part === "prev_year_number" && (
