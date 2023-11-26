@@ -26,7 +26,7 @@ export default function MostReleasesInDaySlide({
           {part === "main" && (
             <div className="flex flex-col justify-center items-center">
               <h1>
-                <span className="font-bold text-6xl text-yellow-200">
+                <span className="font-bold text-8xl text-yellow-300">
                   {data.count}
                 </span>{" "}
                 <span className="font-normal text-6xl inline-block ml-3">

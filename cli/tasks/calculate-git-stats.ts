@@ -832,7 +832,7 @@ async function getCommitMessageLengths(
   const cmd = `
       mergestat "
         select
-          length(message) as length,
+          length(message) - 1 as length,
           count(*) as frequency
         from commits
         group by length

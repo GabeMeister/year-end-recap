@@ -22,23 +22,44 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
           )}
           {part === "third_place" && (
             <div className="flex flex-col items-center">
-              <h1>3rd Place</h1>
-              <div>{data[2].path}</div>
-              <div className="italic">({data[2].lines} lines)</div>
+              <h1 className="text-5xl italic text-yellow-600">
+                <span className="font-bold">3</span>
+                <span className="text-3xl ">rd Place:</span>
+              </h1>
+              <div className="mt-6 text-3xl text-yellow-300 text-center">
+                {data[2].path}
+              </div>
+              <div className="italic mt-6 text-lg text-gray-500">
+                ({data[2].lines.toLocaleString()} lines)
+              </div>
             </div>
           )}
           {part === "second_place" && (
             <div className="flex flex-col items-center">
-              <h1>2nd Place</h1>
-              <div>{data[1].path}</div>
-              <div className="italic">({data[1].lines} lines)</div>
+              <h1 className="text-5xl italic text-gray-400">
+                <span className="font-bold">2</span>
+                <span className="text-3xl ">nd Place:</span>
+              </h1>
+              <div className="mt-6 text-3xl text-yellow-300 text-center">
+                {data[1].path}
+              </div>
+              <div className="italic mt-6 text-lg text-gray-500">
+                ({data[1].lines.toLocaleString()} lines)
+              </div>
             </div>
           )}
           {part === "first_place" && (
             <div className="flex flex-col items-center">
-              <h1>1st Place</h1>
-              <div>{data[0].path}</div>
-              <div className="italic">({data[0].lines} lines)</div>
+              <h1 className="text-5xl italic text-yellow-400">
+                <span className="font-bold">1</span>
+                <span className="text-3xl ">st Place:</span>
+              </h1>
+              <div className="mt-6 text-3xl text-yellow-300 text-center">
+                {data[0].path}
+              </div>
+              <div className="italic mt-6 text-lg text-gray-500">
+                ({data[0].lines.toLocaleString()} lines)
+              </div>
             </div>
           )}
         </div>

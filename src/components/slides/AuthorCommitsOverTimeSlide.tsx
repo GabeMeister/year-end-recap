@@ -3,6 +3,7 @@ import { AuthorCommitsOverTime } from "@/src/types/git";
 import LoadingSpinner from "../LoadingSpinner";
 import { useEffect } from "react";
 import paintRacingBarChart from "@/src/utils/racing-bar-chart";
+import Button from "@/src/components/Button";
 
 type AuthorCommitsOverTimeSlide = {
   part: string;
@@ -47,9 +48,22 @@ export default function AuthorCommitsOverTimeSlide({
             </div>
           )}
           {part === "main" && (
-            <div className="overflow-y-scroll w-[1000px]">
-              <div id="racing-bar-chart" />
-            </div>
+            <>
+              <div className="overflow-y-scroll w-[1000px]">
+                <div id="racing-bar-chart" />
+              </div>
+              <div className="flex items-center justify-center mt-6">
+                <Button
+                  className="w-24"
+                  onClick={() => {
+                    document.querySelector("#racing-bar-chart svg")?.remove();
+                    paintRacingBarChart({ commitsOverTime, width: 1000 });
+                  }}
+                >
+                  Replay
+                </Button>
+              </div>
+            </>
           )}
         </>
       )}

@@ -26,13 +26,11 @@ export default function AvgReleasesPerDaySlide({
           )}
           {part === "main" && (
             <div className="flex flex-col justify-center items-center">
-              <h1>
-                <span className="font-bold text-6xl text-green-300">
-                  {data.count.toFixed(2)}
-                </span>{" "}
-                <span className="font-normal text-6xl inline-block ml-3">
-                  Releases / Day <span className="text-5xl">💪</span>
-                </span>
+              <h1 className="font-bold text-8xl text-yellow-300">
+                {data.count.toFixed(2)}
+              </h1>{" "}
+              <h1 className="font-normal text-4xl inline-block mt-6">
+                Releases / Day!
               </h1>
             </div>
           )}

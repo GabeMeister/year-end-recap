@@ -18,16 +18,12 @@ type CommitMessageLengthsSlideProps = {
 export default function CommitMessageLengthsSlide({
   part,
 }: CommitMessageLengthsSlideProps) {
-  const {
-    data: commits,
-    error,
-    isLoading,
-  } = useStats<CommitMessageLength[]>({
+  const { data, error, isLoading } = useStats<CommitMessageLength[]>({
     part: "commitMessageLengths",
   });
 
   useEffect(() => {
-    if (!commits) {
+    if (!data) {
       return;
     }
 
@@ -44,7 +40,7 @@ export default function CommitMessageLengthsSlide({
       .style("background-color", "white");
 
     // We want the shortest commits first
-    commits?.reverse();
+    const commits = data?.toReversed();
 
     /*
      * X SCALE CALCULATION
@@ -103,8 +99,18 @@ export default function CommitMessageLengthsSlide({
       .append("g")
       .attr("transform", `translate(0,${height - marginBottom})`)
       .call(d3.axisBottom(x).tickValues(percentiles).tickSizeOuter(0))
+      .call((g) =>
+        g
+          .append("text")
+          .attr("x", width / 2 - 120)
+          .attr("y", 50)
+          .attr("font-size", "18px")
+          .attr("fill", "currentColor")
+          .attr("text-anchor", "start")
+          .text("→ Commit Length")
+      )
       .selectAll("text")
-      .attr("font-size", "14px");
+      .attr("font-size", "16px");
 
     /*
      * Y AXIS
@@ -128,7 +134,7 @@ export default function CommitMessageLengthsSlide({
           .attr("font-size", "18px")
           .attr("fill", "currentColor")
           .attr("text-anchor", "start")
-          .text("↑ Number of Commits")
+          .text("↑ # of Commits")
       );
 
     /*
@@ -152,16 +158,20 @@ export default function CommitMessageLengthsSlide({
       .on("mouseover", (event, d) => {
         tooltip.style("opacity", 0.9);
         tooltip
-          .html(`Length: ${d.length} <br /> Frequency: ${d.frequency}`)
+          .html(
+            `# of Commits: ${
+              d.frequency
+            } <br /> Commit Length: ${d.length.toLocaleString()}`
+          )
           .style("left", event.pageX - 50 + "px")
           .style("top", event.pageY - 100 + "px");
       })
-      .on("mousemove", (event, d) => {
+      .on("mousemove", (event, _d) => {
         tooltip
           .style("left", event.pageX - 50 + "px")
           .style("top", event.pageY - 100 + "px");
       })
-      .on("mouseout", (d) => {
+      .on("mouseout", (_d) => {
         tooltip.style("opacity", 0);
       });
 
@@ -185,15 +195,15 @@ export default function CommitMessageLengthsSlide({
       .delay(function (_d, i) {
         return i * 5;
       });
-  }, [commits, part]);
+  }, [data, part]);
 
   return (
     <div className="CommitMessageLengthsSlide">
-      {commits && (
+      {data && (
         <>
           {part === "main" && (
             <div className="h-[700px] w-[1210px]">
-              <div id="bar-chart" className="" />
+              <div id="bar-chart" />
             </div>
           )}
         </>

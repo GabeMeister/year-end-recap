@@ -13,6 +13,15 @@ export default function ShortestCommitsSlide({
     part: "shortestCommits",
   });
 
+  const Content = ({ idx }: { idx: number }) => (
+    <div className="h-[500px] w-[700px] flex flex-col justify-evenly items-center">
+      <h1 className="text-5xl">{data[idx].author_name}:</h1>
+      <h2 className="text-9xl p-6 rounded-md bg-slate-700 w-fit">
+        {data[idx].message.replace("\n", "")}
+      </h2>
+    </div>
+  );
+
   return (
     <div className="ShortestCommitsSlide">
       {data && (
@@ -22,36 +31,11 @@ export default function ShortestCommitsSlide({
               <h1 className="text-5xl slide-fade-in">Shortest Commits</h1>
             </div>
           )}
-          {part === "first" && (
-            <div className="overflow-y-scroll h-[500px] w-[700px]">
-              <h1>{data[0].author_name}</h1>
-              <h2>{data[0].message.replace("\n", "")}</h2>
-            </div>
-          )}
-          {part === "second" && (
-            <div className="overflow-y-scroll h-[500px] w-[700px]">
-              <h1>{data[1].author_name}</h1>
-              <h2>{data[1].message.replace("\n", "")}</h2>
-            </div>
-          )}
-          {part === "third" && (
-            <div className="overflow-y-scroll h-[500px] w-[700px]">
-              <h1>{data[2].author_name}</h1>
-              <h2>{data[2].message.replace("\n", "")}</h2>
-            </div>
-          )}
-          {part === "fourth" && (
-            <div className="overflow-y-scroll h-[500px] w-[700px]">
-              <h1>{data[3].author_name}</h1>
-              <h2>{data[3].message.replace("\n", "")}</h2>
-            </div>
-          )}
-          {part === "fifth" && (
-            <div className="overflow-y-scroll h-[500px] w-[700px]">
-              <h1>{data[4].author_name}</h1>
-              <h2>{data[4].message.replace("\n", "")}</h2>
-            </div>
-          )}
+          {part === "first" && <Content idx={0} />}
+          {part === "second" && <Content idx={1} />}
+          {part === "third" && <Content idx={2} />}
+          {part === "fourth" && <Content idx={3} />}
+          {part === "fifth" && <Content idx={4} />}
         </>
       )}
       {isLoading && (
