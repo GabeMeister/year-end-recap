@@ -31,7 +31,7 @@ export default function MobileWarningPage() {
           <span className="font-bold">desktop</span> browser. (Trust us!)
         </h1>
         <div className="mt-16 flex flex-col justify-start">
-          <span className="text-gray-300">Here&apos;s the url:</span>
+          <span className="text-gray-300">Email yourself the url:</span>
           <div className="mt-1 w-64">
             <ClipboardCopyInput text={window.location.href} />
           </div>
