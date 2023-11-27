@@ -11,6 +11,16 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
     part: "longestFiles",
   });
 
+  function getFontSizeThatFits(length: number): string {
+    if (length <= 60) {
+      return "text-3xl";
+    } else if (length > 60 && length <= 80) {
+      return "text-2xl";
+    } else {
+      return "text-xl";
+    }
+  }
+
   return (
     <div className="LongestFilesSlide">
       {data && (
@@ -26,7 +36,11 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
                 <span className="font-bold">3</span>
                 <span className="text-3xl ">rd Place:</span>
               </h1>
-              <div className="mt-6 text-3xl text-yellow-300 text-center">
+              <div
+                className={`mt-6 text-yellow-300 text-center ${getFontSizeThatFits(
+                  data[2].path.length
+                )}`}
+              >
                 {data[2].path}
               </div>
               <div className="italic mt-6 text-lg text-gray-500">
@@ -40,7 +54,11 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
                 <span className="font-bold">2</span>
                 <span className="text-3xl ">nd Place:</span>
               </h1>
-              <div className="mt-6 text-3xl text-yellow-300 text-center">
+              <div
+                className={`mt-6 text-yellow-300 text-center ${getFontSizeThatFits(
+                  data[1].path.length
+                )}`}
+              >
                 {data[1].path}
               </div>
               <div className="italic mt-6 text-lg text-gray-500">
@@ -54,7 +72,11 @@ export default function LongestFilesSlide({ part }: LongestFilesSlideProps) {
                 <span className="font-bold">1</span>
                 <span className="text-3xl ">st Place:</span>
               </h1>
-              <div className="mt-6 text-3xl text-yellow-300 text-center">
+              <div
+                className={`mt-6 text-yellow-300 text-center ${getFontSizeThatFits(
+                  data[0].path.length
+                )}`}
+              >
                 {data[0].path}
               </div>
               <div className="italic mt-6 text-lg text-gray-500">

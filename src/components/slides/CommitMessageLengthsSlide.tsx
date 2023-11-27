@@ -4,7 +4,7 @@ import { CommitMessageLength } from "@/src/types/git";
 import LoadingSpinner from "../LoadingSpinner";
 import { useEffect } from "react";
 
-const width = 1200;
+const width = 900;
 const height = 700;
 const marginTop = 50;
 const marginRight = 30;
@@ -202,7 +202,7 @@ export default function CommitMessageLengthsSlide({
       {data && (
         <>
           {part === "main" && (
-            <div className="h-[700px] w-[1210px]">
+            <div className="h-[700px] w-[910px]">
               <div id="bar-chart" />
             </div>
           )}

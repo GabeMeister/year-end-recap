@@ -5,11 +5,13 @@ type BasicLinkProps = {
   href: string;
   children: JSX.Element | string;
   className?: string;
+  target?: string;
 };
 
 export default function BasicLink({
   href,
   children,
+  target,
   className,
 }: BasicLinkProps) {
   const mergedCss = twMerge(
@@ -18,7 +20,7 @@ export default function BasicLink({
   );
 
   return (
-    <Link href={href} className={mergedCss}>
+    <Link href={href} className={mergedCss} target={target}>
       {children}
     </Link>
   );
