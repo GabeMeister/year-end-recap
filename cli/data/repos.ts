@@ -167,19 +167,19 @@ const repos: Repo[] = [
   //   masterMergeSnippet: "v7",
   //   testFunctions: ["it(", "test("],
   // },
-  {
-    name: "Jest",
-    url: "https://github.com/jestjs/jest",
-    path: "/home/gabe/dev/jest",
-    sshCloneUrl: "git@github.com:jestjs/jest.git",
-    host: "github",
-    duplicateAuthors: {},
-    includeFiles: ["js", "ts"],
-    excludeDirs: ["node_modules"],
-    masterBranch: "main",
-    masterMergeSnippet: "v29",
-    testFunctions: ["it(", "test("],
-  },
+  // {
+  //   name: "Jest",
+  //   url: "https://github.com/jestjs/jest",
+  //   path: "/home/gabe/dev/jest",
+  //   sshCloneUrl: "git@github.com:jestjs/jest.git",
+  //   host: "github",
+  //   duplicateAuthors: {},
+  //   includeFiles: ["js", "ts"],
+  //   excludeDirs: ["node_modules"],
+  //   masterBranch: "main",
+  //   masterMergeSnippet: "v29",
+  //   testFunctions: ["it(", "test("],
+  // },
 
   /*
    * EXTREMELY LONG REPOS

@@ -10,6 +10,7 @@ export async function runExec(cmd: string, options?: ExecOptions) {
       cmd,
       {
         cwd: options?.cwd,
+        maxBuffer: 1024 * 1024 * 1024,
       },
       (error, stdout, stderr) => {
         if (error) {

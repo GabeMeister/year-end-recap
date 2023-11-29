@@ -35,6 +35,7 @@ import {
   CommitMessageLength,
   AvgReleasesPerDay,
   MostReleasesInDay,
+  AuthorBlameCount,
 } from "../../src/types/git";
 import {
   getUnixTimeAtMidnight,
@@ -44,7 +45,7 @@ import {
 import { RawCommit, getChangesFromGitLogStr } from "../utils/git";
 import { NumberObject } from "../../src/types/general";
 import { clone } from "../utils/object";
-import { getPrintFilesCmd } from "../utils/files";
+import { getRepoFileList, getPrintFilesCmd } from "../utils/files";
 
 function getAuthorName(
   name: string,
@@ -882,6 +883,58 @@ async function getMostReleasesInDay(repo: Repo): Promise<MostReleasesInDay> {
   return JSON.parse(stdout)[0] as MostReleasesInDay;
 }
 
+async function getAuthorBlameCount(repo: Repo): Promise<AuthorBlameCount[]> {
+  const allFiles = await getRepoFileList(
+    repo.path,
+    repo.includeFiles,
+    repo.excludeDirs
+  );
+
+  const authorBlameCountMap: Record<string, number> = {};
+
+  for (let i = 0; i < allFiles.length; i++) {
+    if (i % 50 === 0) {
+      console.log(`Processing file #${i} / ${allFiles.length}`);
+    }
+
+    const file = allFiles[i];
+
+    try {
+      const blameOutput = await runExec(`git blame ${file} --line-porcelain`, {
+        cwd: repo.path,
+      });
+      const authors = blameOutput
+        .split("\n")
+        .filter((l) => l.includes("committer "))
+        .map((l) => l.replace("committer ", ""));
+
+      authors.forEach((a) => {
+        const realName = getAuthorName(a, repo.duplicateAuthors);
+        if (authorBlameCountMap[realName]) {
+          authorBlameCountMap[realName]++;
+        } else {
+          authorBlameCountMap[realName] = 1;
+        }
+      });
+    } catch (e) {
+      console.log(`Error occurred on ${file}`, (e as Error).message);
+    }
+  }
+
+  let authorBlames: AuthorBlameCount[] = [];
+
+  Object.keys(authorBlameCountMap).forEach((name) => {
+    authorBlames.push({
+      name,
+      lineCount: authorBlameCountMap[name],
+    });
+  });
+
+  authorBlames = [...authorBlames].sort((a, b) => b.lineCount - a.lineCount);
+
+  return authorBlames;
+}
+
 type RepoStats = {
   commitData: AuthorCommits[];
   teamAuthorData: TeamAuthorData;
@@ -899,6 +952,7 @@ type RepoStats = {
   commitMessageLengths: CommitMessageLength[];
   avgReleasesPerDay: AvgReleasesPerDay;
   mostReleasesInDay: MostReleasesInDay;
+  authorBlames: AuthorBlameCount[];
 };
 
 async function upsertRepo(repo: Repo, stats: RepoStats) {
@@ -923,6 +977,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     commitMessageLengths: stats.commitMessageLengths,
     avgReleasesPerDay: stats.avgReleasesPerDay,
     mostReleasesInDay: stats.mostReleasesInDay,
+    authorBlames: stats.authorBlames,
   };
 
   await db
@@ -970,6 +1025,7 @@ async function task() {
       const commitMessageLengths = await getCommitMessageLengths(repo);
       const avgReleasesPerDay = await getAvgReleasesPerDay(repo);
       const mostReleasesInDay = await getMostReleasesInDay(repo);
+      const authorBlames = await getAuthorBlameCount(repo);
 
       await upsertRepo(repo, {
         commitData,
@@ -988,6 +1044,7 @@ async function task() {
         commitMessageLengths,
         avgReleasesPerDay,
         mostReleasesInDay,
+        authorBlames,
       });
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);

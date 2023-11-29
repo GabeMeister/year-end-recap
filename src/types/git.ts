@@ -19,6 +19,7 @@ export type RepoRecap = {
   commitMessageLengths: CommitMessageLength[];
   avgReleasesPerDay: AvgReleasesPerDay;
   mostReleasesInDay: MostReleasesInDay;
+  authorBlames: AuthorBlameCount[];
 };
 
 export type CommitData = {
@@ -141,6 +142,11 @@ export type AvgReleasesPerDay = {
 export type MostReleasesInDay = {
   count: number;
   date: string;
+};
+
+export type AuthorBlameCount = {
+  name: string;
+  lineCount: number;
 };
 
 export type StatsQuery = {
