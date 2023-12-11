@@ -58,6 +58,15 @@ function getAuthorName(
   }
 }
 
+async function checkForDependencies(): Promise<boolean> {
+  // mergestat
+  // git
+  // find
+  // npx
+
+  return true;
+}
+
 async function gitPullRepo(path: string) {
   console.log("Pulling repo...");
 
@@ -980,7 +989,7 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
     authorBlames: stats.authorBlames,
   };
 
-  await db
+  const id = await db
     .insertInto("repos")
     .values({
       name: repo.name,
@@ -998,7 +1007,10 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
         data: repoRecap,
       })
     )
+    .returning(["id"])
     .execute();
+
+  return id;
 }
 
 async function task() {
@@ -1027,7 +1039,7 @@ async function task() {
       const mostReleasesInDay = await getMostReleasesInDay(repo);
       const authorBlames = await getAuthorBlameCount(repo);
 
-      await upsertRepo(repo, {
+      const id = await upsertRepo(repo, {
         commitData,
         teamAuthorData,
         teamCommitData,
@@ -1046,13 +1058,15 @@ async function task() {
         mostReleasesInDay,
         authorBlames,
       });
+
+      console.log(
+        `\n✅ Data uploaded!\n\nView your Year End Recap here: https://yearendrecap.com/presentation/${id[0].id}`
+      );
     } catch (e) {
       console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
       console.error(e);
     }
   }
-
-  console.log("\n\nDone!");
 }
 
 export default task;

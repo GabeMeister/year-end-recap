@@ -22,3 +22,14 @@ export async function runExec(cmd: string, options?: ExecOptions) {
     );
   });
 }
+
+export async function runExecSafe(cmd: string, options?: ExecOptions) {
+  try {
+    return await runExec(cmd, options);
+  } catch (e) {
+    console.log(
+      `Error occurred while running '${cmd}': ${(e as Error).toString()}`
+    );
+    return "";
+  }
+}
