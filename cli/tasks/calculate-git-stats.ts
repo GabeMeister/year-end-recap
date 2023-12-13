@@ -1,4 +1,5 @@
 import { pickBy } from "lodash";
+import { program } from "commander";
 import {
   convertDateToUTC,
   createDateMap,
@@ -46,6 +47,7 @@ import { RawCommit, getChangesFromGitLogStr } from "../utils/git";
 import { NumberObject } from "../../src/types/general";
 import { clone } from "../utils/object";
 import { getRepoFileList, getPrintFilesCmd } from "../utils/files";
+import fs from "fs";
 
 function getAuthorName(
   name: string,
@@ -1013,59 +1015,108 @@ async function upsertRepo(repo: Repo, stats: RepoStats) {
   return id;
 }
 
+function getCliArgs() {
+  program.description(
+    "An application for generating your Year End Recap data."
+  );
+  program.option(
+    "-g, --generate",
+    "Generate blank config file for repo (will save to ./yer.json)"
+  );
+  program.parse();
+
+  return program.opts();
+}
+
 async function task() {
-  for (let i = 0; i < repos.length; i++) {
-    const repo = repos[i];
+  try {
+    const args = getCliArgs();
 
-    try {
-      console.log("\n\n\n==== REPO:", repo.name, " ====\n");
+    if (args.generate) {
+      let config: Repo = {
+        name: "My Example Repo",
+        url: "https://github.com/supercoder99/my-repo",
+        path: "/directory/path/to/my/repo",
+        sshCloneUrl: "git@github.com:supercoder99/my-repo.git",
+        host: "github",
+        duplicateAuthors: {
+          Bob: "Bob the Builder",
+        },
+        includeFiles: ["ts", "tsx", "js", "jsx"],
+        excludeDirs: ["node_modules", ".next"],
+        masterBranch: "master",
+        masterMergeSnippet: "%into ''master''%",
+        testFunctions: ["it(", "test("],
+      };
 
-      await gitPullRepo(repo.path);
-      const commitData = await getCommitsByAuthor(repo);
-      const teamAuthorData = await getTeamAuthorCounts(repo);
-      const teamCommitData = await getTeamCommitCount(repo);
-      const fileCount = await getFileCount(repo);
-      const linesOfCode = await getLinesOfCode(repo);
-      const longestFiles = await getLongestFiles(repo);
-      const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
-      const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
-      const teamCommitsByWeekDay = await getTeamCommitsByWeekDay(repo);
-      const teamCommitsByHour = await getTeamCommitsByHour(repo);
-      const highestCommitDayByAuthor = await getHighestCommitDayByAuthor(repo);
-      const longestCommit = await getLongestCommit(repo);
-      const shortestCommits = await getShortestCommits(repo);
-      const commitMessageLengths = await getCommitMessageLengths(repo);
-      const avgReleasesPerDay = await getAvgReleasesPerDay(repo);
-      const mostReleasesInDay = await getMostReleasesInDay(repo);
-      const authorBlames = await getAuthorBlameCount(repo);
+      fs.writeFileSync("./yer.json", JSON.stringify(config, null, 2));
 
-      const id = await upsertRepo(repo, {
-        commitData,
-        teamAuthorData,
-        teamCommitData,
-        fileCount,
-        linesOfCode,
-        longestFiles,
-        authorCommitsOverTime,
-        teamCommitsByMonth,
-        teamCommitsByWeekDay,
-        teamCommitsByHour,
-        highestCommitDayByAuthor,
-        longestCommit,
-        shortestCommits,
-        commitMessageLengths,
-        avgReleasesPerDay,
-        mostReleasesInDay,
-        authorBlames,
-      });
+      console.log(`
+Created a config file at:
 
-      console.log(
-        `\n✅ Data uploaded!\n\nView your Year End Recap here: https://yearendrecap.com/presentation/${id[0].id}`
-      );
-    } catch (e) {
-      console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
-      console.error(e);
+./yer.json
+
+Please modify the config file for the repo you
+want to generate a Year End Recap for, and then run:
+
+npx year-end-recap`);
+
+      console.log(`\n✅ Done!`);
+    } else {
+      for (let i = 0; i < repos.length; i++) {
+        const repo = repos[i];
+        try {
+          console.log("\n\n\n==== REPO:", repo.name, " ====\n");
+          await gitPullRepo(repo.path);
+          const commitData = await getCommitsByAuthor(repo);
+          const teamAuthorData = await getTeamAuthorCounts(repo);
+          const teamCommitData = await getTeamCommitCount(repo);
+          const fileCount = await getFileCount(repo);
+          const linesOfCode = await getLinesOfCode(repo);
+          const longestFiles = await getLongestFiles(repo);
+          const authorCommitsOverTime = await getAuthorCommitsOverTime(repo);
+          const teamCommitsByMonth = await getTeamCommitsByMonth(repo);
+          const teamCommitsByWeekDay = await getTeamCommitsByWeekDay(repo);
+          const teamCommitsByHour = await getTeamCommitsByHour(repo);
+          const highestCommitDayByAuthor = await getHighestCommitDayByAuthor(
+            repo
+          );
+          const longestCommit = await getLongestCommit(repo);
+          const shortestCommits = await getShortestCommits(repo);
+          const commitMessageLengths = await getCommitMessageLengths(repo);
+          const avgReleasesPerDay = await getAvgReleasesPerDay(repo);
+          const mostReleasesInDay = await getMostReleasesInDay(repo);
+          const authorBlames = await getAuthorBlameCount(repo);
+          const id = await upsertRepo(repo, {
+            commitData,
+            teamAuthorData,
+            teamCommitData,
+            fileCount,
+            linesOfCode,
+            longestFiles,
+            authorCommitsOverTime,
+            teamCommitsByMonth,
+            teamCommitsByWeekDay,
+            teamCommitsByHour,
+            highestCommitDayByAuthor,
+            longestCommit,
+            shortestCommits,
+            commitMessageLengths,
+            avgReleasesPerDay,
+            mostReleasesInDay,
+            authorBlames,
+          });
+          console.log(
+            `\n✅ Data uploaded!\n\nView your Year End Recap here: https://yearendrecap.com/presentation/${id[0].id}`
+          );
+        } catch (e) {
+          console.log(`\nERROR HAPPENED ON ${repo.name}\n`);
+          console.error(e);
+        }
+      }
     }
+  } catch (e) {
+    console.log(`An unknown error occurred while running program: ${e}`);
   }
 }
 
