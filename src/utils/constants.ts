@@ -16,6 +16,9 @@ export const ALL_SLIDES = [
   "longest_commit",
   "shortest_commits",
   "commit_message_lengths",
+
+  "author_blame_counts",
+
   "avg_releases_per_day",
   "most_releases_in_day",
   "ending",
@@ -58,6 +61,9 @@ export const SLIDE_PARTS = {
   longest_commit: ["title", "author", "commit"],
   shortest_commits: ["title", "first", "second", "third", "fourth", "fifth"],
   commit_message_lengths: ["main"],
+
+  author_blame_counts: ["title", "main"],
+
   avg_releases_per_day: ["title", "main"],
   most_releases_in_day: ["title", "main"],
   ending: ["main"],

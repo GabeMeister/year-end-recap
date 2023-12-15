@@ -172,6 +172,14 @@ export default async function handler(
         .limit(1)
         .execute();
       break;
+    case "authorBlames":
+      data = await db
+        .selectFrom("repos")
+        .select(sql<CommitMessageLength[]>`data->'authorBlames'`.as("stats"))
+        .where("id", "=", id)
+        .limit(1)
+        .execute();
+      break;
     case "avgReleasesPerDay":
       data = await db
         .selectFrom("repos")

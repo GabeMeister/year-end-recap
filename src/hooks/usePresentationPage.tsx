@@ -25,6 +25,7 @@ import {
 } from "@/src/utils/slides";
 import useKeyboardShortcuts from "./useKeyboardShortcuts";
 import EndingSlide from "../components/slides/EndingSlide";
+import AuthorBlameCountsSlide from "../components/slides/AuthorBlameCountsSlide";
 
 type usePresentationPageParams = {
   id: number;
@@ -123,6 +124,9 @@ export default function usePresentationPage({
         break;
       case "commit_message_lengths":
         slideComponent = <CommitMessageLengthsSlide part={slidePart.part} />;
+        break;
+      case "author_blame_counts":
+        slideComponent = <AuthorBlameCountsSlide part={slidePart.part} />;
         break;
       case "avg_releases_per_day":
         slideComponent = <AvgReleasesPerDaySlide part={slidePart.part} />;
