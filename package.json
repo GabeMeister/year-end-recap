@@ -6,11 +6,10 @@
     "type": "git",
     "url": "https://github.com/GabeMeister/year-end-recap"
   },
-  "bin": {
-    "cli": "npx ts-node ./cli/index.ts"
-  },
+  "bin": "./bin/cli/index.js",
   "scripts": {
     "cli": "npx ts-node ./cli/index.ts",
+    "build-cli": "npx tsc -p cli/tsconfig.json --outDir ./bin/",
     "prisma": "prisma",
     "dev": "next dev",
     "build": "next build",
