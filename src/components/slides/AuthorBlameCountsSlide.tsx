@@ -76,6 +76,11 @@ type AuthorBlameCountsSlideProps = {
   part: string;
 };
 
+type PieChartData = {
+  labels: string[];
+  datasets: any[];
+};
+
 export default function AuthorBlameCountsSlide({
   part,
 }: AuthorBlameCountsSlideProps) {
@@ -84,7 +89,10 @@ export default function AuthorBlameCountsSlide({
   });
   console.log("\n\n***** data *****\n", data, "\n\n");
 
-  let CHART_DATA = {};
+  let CHART_DATA: PieChartData = {
+    labels: [],
+    datasets: [],
+  };
 
   if (!isLoading) {
     CHART_DATA = {
