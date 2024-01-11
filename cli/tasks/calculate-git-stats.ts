@@ -49,6 +49,8 @@ import { clone } from "../utils/object";
 import { getRepoFileList, getPrintFilesCmd } from "../utils/files";
 import fs from "fs";
 
+const YEAR = 2023;
+
 function getAuthorName(
   name: string,
   duplicateAuthors: Record<string, string>
@@ -81,10 +83,13 @@ async function getCommitsByAuthor(repo: Repo): Promise<AuthorCommits[]> {
   console.log("Getting commits by author...");
 
   const output = await runExec(
-    `mergestat 'SELECT author_name as name, count(*) as commits
-      FROM commits GROUP BY name
+    `mergestat "SELECT author_name as name, count(*) as commits
+      FROM commits
+      WHERE author_when >= DATETIME('${YEAR}-01-01 00:00:00')
+        AND author_when <= DATETIME('${YEAR}-12-31 23:59:59')
+      GROUP BY name
       HAVING commits > 1
-      ORDER BY commits desc;' -f json`,
+      ORDER BY commits desc;" -f json`,
     {
       cwd: repo.path,
     }
@@ -125,7 +130,11 @@ async function getCommitsByAuthor(repo: Repo): Promise<AuthorCommits[]> {
 
 async function getAuthorFirstCommits(repo: Repo): Promise<AuthorFirstCommits> {
   let stdout = await runExec(
-    `mergestat 'select author_name as name, min(author_when) as first_commit from commits group by author_name;' -f json`,
+    `mergestat "select
+      author_name as name,
+      min(author_when) as first_commit
+      from commits
+      group by author_name;" -f json`,
     {
       cwd: repo.path,
     }
@@ -163,8 +172,7 @@ async function getTeamAuthorCounts(repo: Repo): Promise<TeamAuthorData> {
     repo
   );
 
-  const now = new Date(Date.now());
-  const beginningOfYear = new Date(now.getFullYear(), 0, 1);
+  const beginningOfYear = new Date(YEAR, 0, 2);
   const prevYearFirstCommits: AuthorFirstCommits = pickBy(
     authorFirstCommits,
     (v) => {
@@ -204,9 +212,8 @@ async function getTeamAuthorCounts(repo: Repo): Promise<TeamAuthorData> {
 async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
   console.log("Getting team-wide commit totals...");
 
-  const now = new Date(Date.now());
   const stdout1 = await runExec(
-    `mergestat "select count(*) as count from commits where author_when < '${now.getFullYear()}-01-01'" -f json`,
+    `mergestat "select count(*) as count from commits where author_when < '${YEAR}-01-01'" -f json`,
     {
       cwd: repo.path,
     }
@@ -219,7 +226,7 @@ async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
   const prevYear: RawOutput = JSON.parse(stdout1)[0];
 
   const stdout2 = await runExec(
-    `mergestat "select count(*) as count from commits where author_when >= '${now.getFullYear()}-01-01'" -f json`,
+    `mergestat "select count(*) as count from commits where author_when >= '${YEAR}-01-01'" -f json`,
     {
       cwd: repo.path,
     }
@@ -234,7 +241,7 @@ async function getTeamCommitCount(repo: Repo): Promise<TeamCommitData> {
 }
 
 async function getLastCommitFromPrevYear(repo: Repo): Promise<string> {
-  const firstDayOfYear = getFirstDayOfYearStr();
+  const firstDayOfYear = getFirstDayOfYearStr(YEAR);
   let stdout = await runExec(
     `mergestat "select hash, max(author_when) as last_commit from commits where author_when < '${firstDayOfYear}';" -f json`,
     {
@@ -464,7 +471,7 @@ async function getAuthorCommitsOverTime(
     }
   }
 
-  const firstDayOfYear = getFirstDayOfYear();
+  const firstDayOfYear = getFirstDayOfYear(YEAR);
 
   return cumulativeCommits.filter((c) => {
     return new Date(c.date) >= firstDayOfYear;
@@ -474,7 +481,7 @@ async function getAuthorCommitsOverTime(
 async function getTeamCommitsForYear(repo: Repo): Promise<number> {
   console.log("Getting team commits for year...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const stdout = await runExec(
     `mergestat "SELECT count(*) as count FROM commits where author_when > '${firstDayStr}'" -f json`,
     {
@@ -490,7 +497,7 @@ async function getTeamCommitsForYear(repo: Repo): Promise<number> {
 async function getTeamChangedLinesForYear(repo: Repo): Promise<LineChangeStat> {
   console.log("Getting team changed lines for year...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const lastDayStr = getLastDayOfYearStr();
   const stdout = await runExec(
     `git log --since="${firstDayStr}" --until="${lastDayStr}" --stat | grep -E "insertions|deletions"`,
@@ -557,7 +564,7 @@ async function getTeamChangedLinesForYear(repo: Repo): Promise<LineChangeStat> {
 async function getTeamCommitsByMonth(repo: Repo): Promise<TeamCommitsByMonth> {
   console.log("Getting team overall commits by month...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const cmd = `mergestat "
         select
           strftime('%m', author_when) as month,
@@ -594,7 +601,7 @@ async function getTeamCommitsByWeekDay(
 ): Promise<TeamCommitsByWeekDay> {
   console.log("Getting team overall commits by week day...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const cmd = `mergestat "
         select
           strftime('%w', author_when) as weekday,
@@ -630,7 +637,7 @@ async function getTeamCommitsByWeekDay(
 async function getTeamCommitsByHour(repo: Repo): Promise<TeamCommitsByHour> {
   console.log("Getting team overall commits by hour...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const cmd = `
     mergestat "
       select
@@ -667,7 +674,7 @@ async function getHighestCommitDayByAuthor(
 ): Promise<HighestCommitDaySummary> {
   console.log("Getting highest commit day by author...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const cmd = `
     mergestat "
       select
@@ -735,7 +742,7 @@ async function getMostChangesInDayByAuthor(
 ): Promise<MostChangesDaySummary> {
   console.log("Getting most changes in a day by author...");
 
-  const firstDayStr = getFirstDayOfYearStr();
+  const firstDayStr = getFirstDayOfYearStr(YEAR);
   const lastDay = getLastDayOfYearStr();
   const cmd = `git log --pretty=format:'BEGIN|{ "hash": "%h", "author_name": "%an", "date": "%ad"}' --date=short --since=${firstDayStr} --until=${lastDay} --shortstat --no-merges`;
   const stdout = await runExec(cmd, {
@@ -1043,7 +1050,16 @@ async function task() {
           Bob: "Bob the Builder",
         },
         includeFiles: ["ts", "tsx", "js", "jsx"],
-        excludeDirs: ["node_modules", ".next"],
+        excludeDirs: [
+          "node_modules",
+          ".next",
+          ".clj-kondo",
+          ".babel_cache",
+          "cpcache",
+          ".devcontainer",
+          ".husky",
+          ".vscode",
+        ],
         masterBranch: "master",
         masterMergeSnippet: "%into ''master''%",
         testFunctions: ["it(", "test("],
@@ -1070,6 +1086,11 @@ npx year-end-recap`);
           await gitPullRepo(repo.path);
           const commitData = await getCommitsByAuthor(repo);
           const teamAuthorData = await getTeamAuthorCounts(repo);
+          console.log(
+            "\n\n***** teamAuthorData *****\n",
+            teamAuthorData,
+            "\n\n"
+          );
           const teamCommitData = await getTeamCommitCount(repo);
           const fileCount = await getFileCount(repo);
           const linesOfCode = await getLinesOfCode(repo);

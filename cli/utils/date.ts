@@ -8,9 +8,9 @@ export function getDateAtMidnight(dateStr: string): Date {
   return new Date(new Date(dateStr).setHours(0, 0, 0, 0));
 }
 
-export function getFirstDayOfYear(): Date {
-  const now = new Date(Date.now());
-  const firstDay = startOfYear(now);
+export function getFirstDayOfYear(year: number): Date {
+  // TODO: deal with things to not have to do 1/2/2023
+  const firstDay = startOfYear(new Date(`${year}-01-02`));
 
   return firstDay;
 }
@@ -23,8 +23,8 @@ export function getLastDayOfYear(): Date {
 }
 
 // Return 2023-01-01
-export function getFirstDayOfYearStr(): string {
-  return format(getFirstDayOfYear(), "yyyy-MM-dd");
+export function getFirstDayOfYearStr(year: number): string {
+  return format(getFirstDayOfYear(year), "yyyy-MM-dd");
 }
 
 export function getLastDayOfYearStr(): string {
